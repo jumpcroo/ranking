@@ -170,6 +170,60 @@ header{position:sticky;top:0;z-index:30;background:var(--navy);color:#fff;box-sh
 .psLim{background:var(--ok-bg);color:var(--ok)}
 .psTeam{font-size:11px;color:var(--muted);flex-basis:100%}
 .psLvl{display:inline-block;font-weight:700;font-size:9.5px;padding:1px 5px;border-radius:4px;background:var(--chip);color:var(--chip-on);vertical-align:1px}
+
+.anCard{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 14px 10px;margin-top:12px}
+.anH{font-family:Poppins,sans-serif;font-weight:700;font-size:16px;color:var(--ink)}
+.anH2{margin:20px 2px 0}
+.anSub{font-size:12px;color:var(--muted);line-height:1.5;margin:3px 0 10px}
+.anRow{display:grid;grid-template-columns:auto 1fr auto;grid-template-areas:"tier d rk" "bar bar best";gap:4px 10px;align-items:center;padding:9px 0;border-top:1px solid var(--line)}
+.anRow .anTier{grid-area:tier}.anRow .anD{grid-area:d}.anRow .anRk{grid-area:rk;font-size:13px;white-space:nowrap}
+.anRow .anBar{grid-area:bar}.anRow .anBest{grid-area:best;font-size:12px;text-align:right;white-space:nowrap}
+@media(min-width:640px){.anRow{grid-template-columns:110px 1fr 70px 150px 120px;grid-template-areas:"tier d rk best bar"}}
+.anD b{font-family:Poppins,sans-serif;font-weight:600;font-size:13.5px}
+.anD small,.anBest small,.anGaps small,.anLr small{display:block;font-size:11px;color:var(--muted);font-weight:400}
+.anTier{font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:999px;text-align:center;white-space:nowrap}
+.anTier.t1{background:var(--navy);color:#fff}.anTier.t2{background:var(--ok-bg);color:var(--ok)}
+.anTier.t3{background:var(--chip);color:var(--muted)}.anTier.t4{background:var(--warn-bg);color:var(--warn)}
+.anBar{display:block;height:7px;border-radius:99px;background:var(--chip);overflow:hidden;min-width:60px}
+.anBar i{display:block;height:100%;border-radius:99px;background:var(--navy)}
+.anBar.t1 i{background:var(--navy)}.anBar.t2 i{background:var(--ok)}.anBar.t3 i{background:var(--muted)}.anBar.t4 i{background:var(--warn)}
+.anBar.loss i{background:var(--bad)}.anBar.okb i{background:var(--ok)}
+.anRecs{margin:0;padding:0 0 0 20px}
+.anRecs li{font-size:13px;line-height:1.55;padding:6px 0;border-top:1px solid var(--line)}
+.anRecs li:first-child{border-top:0}
+.anKind{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--navy);background:var(--navy-tint);border-radius:5px;padding:1px 6px;margin-right:6px;vertical-align:1px}
+.anStart{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
+.anSt1{font-size:13px;line-height:1.5}
+.anSt1 small{color:var(--muted)}
+.anPl{font-family:Poppins,sans-serif;font-weight:700;color:var(--navy)}
+.anNote{font-size:10.5px;font-weight:600;padding:2px 6px;border-radius:5px;background:var(--chip);color:var(--muted);cursor:help}
+.anGaps{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-top:8px}
+.anGaps>div{background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:12px}
+.anGaps span{display:block;color:var(--muted)}
+.anGaps b{display:block;font-family:Poppins,sans-serif;font-size:15px;color:var(--ink)}
+.anWin{margin-top:8px;font-weight:700;color:var(--ok)}
+.anWarn{margin-top:8px;font-size:12px;color:var(--bad);font-weight:600}
+.anTab{width:100%;border-collapse:collapse;margin-top:10px;font-size:12.5px}
+.anTab th{font-size:11px;font-weight:600;color:var(--muted);text-align:right;padding:4px 6px;vertical-align:bottom}
+.anTab th small{display:block;font-weight:400;font-size:10px}
+.anTab td{padding:5px 6px;border-top:1px solid var(--line);text-align:right;white-space:nowrap}
+.anTab td:first-child,.anTab th:first-child{text-align:left}
+.anLoss,.anSec{margin-top:12px}
+.anLh{font-size:12px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.anLh small{font-weight:400;color:var(--muted)}
+.anLr{display:grid;grid-template-columns:minmax(120px,1.4fr) 2fr auto;gap:8px;align-items:center;font-size:12px;padding:3px 0}
+.anLr b{font-family:Poppins,sans-serif;text-align:right;min-width:44px}
+.anLr i{font-size:10px;font-style:normal;color:var(--muted);background:var(--chip);border-radius:4px;padding:0 4px}
+.anLr small{grid-column:1/-1;margin-top:-2px}
+.anClean{margin-top:8px;font-size:12.5px;background:var(--ok-bg);color:var(--ok);border-radius:8px;padding:7px 10px}
+.anClean i,.anRecs i{font-size:10px;font-style:normal;opacity:.8}
+.anDet{margin-top:10px}
+.anDet summary{cursor:pointer;font-size:12.5px;font-weight:600;color:var(--navy);padding:4px 0}
+.anFoot{font-size:11.5px;color:var(--muted);margin-top:4px;line-height:1.5}
+.anLv{display:flex;align-items:flex-end;gap:6px;height:84px;padding-top:6px}
+.anLv>div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;font-size:10.5px}
+.anLv i{display:block;width:100%;max-width:28px;background:var(--navy);border-radius:4px 4px 0 0}
+.anLv b{font-size:10px;margin-top:2px}.anLv span{color:var(--muted)}
 .winnote{margin:0 0 12px;padding:9px 12px;background:var(--navy-tint);color:var(--navy);border-radius:10px;font-size:12px;line-height:1.5;font-weight:500}
 .winnote b{font-weight:700}
 .profnote{margin:0 0 12px;padding:9px 12px;background:var(--surface-2);color:var(--muted);border:1px solid var(--line);border-radius:10px;font-size:11.5px;line-height:1.5}
@@ -503,11 +557,15 @@ function renderKarta(host){
     b.onclick=()=>{state.selAid=a.aid;render();};list.appendChild(b);});
   host.appendChild(list);
 }
+/*__ANALYZA__*/
 function renderProfile(host,a){
   const back=document.createElement('button');back.className='backbtn';back.textContent='‹ Zpět na hledání';back.onclick=()=>{state.selAid=null;render();};host.appendChild(back);
   const hd=document.createElement('div');hd.className='profhead';
   hd.innerHTML='<div class="nm">'+(a.club==='Jumpcroo'?'★ ':'')+esc(a.name)+'</div><div class="meta"><span>'+(a.club?esc(a.club):'—')+'</span><span>·</span><span>'+genLabel(a.gender)+'</span><span>·</span><span>'+catLabelLvl(a.lvl)+'</span></div>';
   host.appendChild(hd);
+  renderStandings(host,a);
+  renderRecs(host,a);
+  const sh=document.createElement('div');sh.className='anH anH2';sh.textContent='Vývoj v čase a poslední závod';host.appendChild(sh);
   const note=document.createElement('div');note.className='profnote';
   note.innerHTML='Karta ukazuje <b>všechny výsledky v čase</b>, i starší než rozhodné období. '
     +'Svislá čárkovaná linka označuje začátek rozhodného období (od '+czDate(WIN_FROM)+'), '
@@ -524,7 +582,7 @@ function renderProfile(host,a){
     card.innerHTML='<div class="ct"><span class="dn">'+esc(dcName(d))+'</span><span class="badge">'+d+'</span>'+(TEAM.has(d)?'<span class="tag">tým</span>':'')+'<span class="st">nejlepší '+fmt(best)+' · 2 nejl. '+fmt(two)+'</span></div>'+lineChart(s,(()=>{const lc=a.lvl===2?'junior':a.lvl===3?'senior':null;
     const out=[{v:limitFor(d,lc,'mcr'),label:'MČR · strop B',color:'var(--warn)',anchor:'start'}];
     if(lc)out.push({v:limitFor(d,lc,'ms'),label:'MS',color:'var(--ok)',anchor:'end'});
-    return out;})());
+    return out;})())+lastStarts(a.aid,d).map(p=>startDetail(p,a)).join('');
     host.appendChild(card);}
 }
 
@@ -622,6 +680,12 @@ function renderPosun(host){
       if(r._newMs)tags+='<span class="psTag psLim">limit MS</span>';
       h+='<div class="psRow"><span class="d"><b>'+esc(dcName(r.disc))+'</b></span>'+
         '<span class="sc">'+fmt(r.score)+'</span>'+tag+tags;
+      {const g=r.fv!=null?gapInfo(r):null;
+        if(g){const nx=g.targets[0];
+          h+='<span class="psTeam"><b>'+r.pl+'. místo</b> z '+g.n+
+            (nx?' · na '+nx.k+'. '+(isSpeed(r.disc)?'+'+skoky(nx.gap):'+'+body(nx.gap))+' ('+esc(nx.club)+')':' · 🏆')+
+            (r.fs?' · D '+fmt(r.fs.D)+' · P '+fmt(r.fs.P)+(r.fs.Q!=null?' · Q '+pct(r.fs.Q):'')+' · srážky '+(r.fs.M>=1?'0 %':'−'+pct(1-r.fs.M)):'')+
+            (r.sm?' · chybný start −'+skoky(r.sm):'')+'</span>';}}
       if(r._prev)h+='<span class="psTeam">minule '+fmt(r._prev.score)+' — '+esc(shortComp(r._prev.comp))+
         ' <span class="psLvl">'+r._prev.lc+'</span>'+(r._prev.lc!==r.lc?' · jiná úroveň závodu':'')+'</span>';
       if(TEAM.has(r.disc))h+='<span class="psTeam">s '+r.members.filter(m=>m.aid!==a.aid).map(m=>esc(m.name.split(' ')[0])).join(', ')+'</span>';

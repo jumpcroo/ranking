@@ -144,14 +144,58 @@ def comp_date(j):
 new_aids = {}
 
 
+def name_key(nm):
+    """Jméno bez diakritiky, malými písmeny, slova seřazená – aby
+    „Klára Zbranková“ a „Zbranková Klára“ byl jeden člověk."""
+    return " ".join(sorted(re.sub(r"[^a-z ]", "", norm_ascii(nm)).split()))
+
+
+aid_names = defaultdict(set)          # aid -> klíče jmen, pod kterými v datech je
+for p in perfs:
+    for m in p["members"]:
+        aid_names[m["aid"]].add(name_key(m["name"]))
+key2aids = defaultdict(set)           # klíč jména -> aid
+for aid, ks in aid_names.items():
+    for k in ks:
+        key2aids[k].add(aid)
+
+id_unified = {}     # (ID z exportu, jméno) -> sjednocené ID
+id_conflict = {}    # (ID z exportu, jméno) -> komu to ID v datech patří
+
+
 def aid_for(part, pinfo):
-    """Identita závodníka. MemberID je spolehlivé; nový formát exportu ho ale nemá
-    (má 0 a místo něj MemberCode v jiné řadě čísel), tak se páruje podle jména."""
-    if part.get("MemberID"):
-        return "m%d" % part["MemberID"]
+    """Identita závodníka – musí držet napříč soutěžemi, jinak se jednomu
+    člověku rozpadne součet dvou nejlepších na dva lidi, nebo se mu připíše
+    cizí výkon.
+
+    Členská ID v exportech nejsou spolehlivá: stejný člověk má v různých
+    soutěžích různá ID, někdy žádné (MemberID = 0), a výjimečně dostane ID,
+    které v datech patří někomu jinému. Proto se ID věří, jen když souhlasí
+    se jménem:
+      1. ID je v datech známé a patří člověku s tímto jménem  → to ID
+      2. jméno je v datech známé (jednoznačně)                → ID podle jména
+      3. ID je v datech známé, ale patří JINÉMU jménu         → konflikt,
+         nepřiřazuje se, vznikne nové ID podle jména (a vypíše se)
+      4. ID v datech není                                     → to ID
+      5. žádné ID                                             → nové z MemberCode / jména
+    Sjednocení i konflikty build vypisuje, ať se dají zkontrolovat.
+    """
     nm = (part["FirstName"] + " " + part["LastName"]).strip()
-    if nm in name2aid:
-        return name2aid[nm]
+    k = name_key(nm)
+    mid = ("m%d" % part["MemberID"]) if part.get("MemberID") else None
+    if mid and k in aid_names.get(mid, ()):
+        return mid
+    cands = key2aids.get(k, set())
+    if len(cands) == 1:
+        canon = next(iter(cands))
+        if mid and mid != canon:
+            id_unified[(mid, nm)] = canon
+        return canon
+    if mid and mid in aid_names:
+        id_conflict[(mid, nm)] = sorted(aid_names[mid])
+        mid = None
+    if mid:
+        return mid
     if nm in new_aids:
         return new_aids[nm]
     code = (pinfo.get(part["ParticipantID"], {}) or {}).get("MemberCode") or ""
@@ -266,6 +310,221 @@ for path in files:
     comp_levels[comp] = level or "mixed"
     added[comp] = (count, date, level or "mixed", os.path.basename(path), dict(skipped))
 
+# ---------------------------------------------------------------- rozbor
+# Ke každému výkonu, ke kterému existuje JSON export, se připojí:
+#   fv  index „pole“ – seznam všech, proti kterým se závodnice umisťovala
+#   pl  umístění v tom poli
+#   fs  rozpad freestylu (viz enrich.py)
+#   sm  srážka za chybné starty/výměny u rychlosti, pokud nějaká byla
+#
+# Pole (fields) má dvě podoby:
+#  • čistý event (všechny spárované výkony mají stejnou úroveň A/B):
+#    pole = VŠECHNY záznamy oficiálního eventu včetně zahraničních oddílů
+#    a umístění = OFICIÁLNÍ pořadí z výsledkovky
+#  • smíšený event (A i B v jednom eventu – oficiální pořadí je společné,
+#    ale vyhlašuje se zvlášť): pole = jen záznamy téže úrovně, které jsou
+#    v datech nástroje (zahraniční u smíšených soutěží úroveň nemají),
+#    umístění se dopočítá podle IJRU
+# Data nástroje (perfs) zahraniční oddíly nemají záměrně – slouží českému
+# rankingu a nominacím. Pole je jen na umístění a odstupy na konkrétním závodě.
+# Historické soutěže bez exportu (ME, EOT, JME) rozbor nemají.
+sys.path.insert(0, ROOT)
+import enrich  # noqa: E402
+
+def _mini(fs):
+    if not fs:
+        return 0
+    return [fs.get("D"), fs.get("P"), fs.get("Q", 1), fs.get("M")]
+
+perf_by_key = defaultdict(list)
+for p in perfs:
+    k = (p["comp"], p["disc"], frozenset(m["aid"] for m in p["members"]), p["score"], p.get("al"))
+    perf_by_key[k].append(p)
+
+clubs_tbl, club_idx = [], {}
+def cidx(name):
+    name = club_alias.get(name, name) or "?"
+    if name not in club_idx:
+        club_idx[name] = len(clubs_tbl)
+        clubs_tbl.append(name)
+    return club_idx[name]
+
+rcheck, rbad = Counter(), []
+coverage = defaultdict(lambda: [0, 0])
+json_comps = set()
+raw_events = []          # (comp, disc, gender, age, [entry dict])
+
+for path in sorted(f for f in glob.glob(os.path.join(DATA, "*.json")) if os.path.basename(f) not in NOT_RESULTS):
+    j = load_json(path)
+    comp = j.get("CompetitionName")
+    json_comps.add(comp)
+    pinfo = {p_["ParticipantID"]: p_ for p_ in j.get("Participants", [])}
+    teams = {t["TeamID"]: t["TeamName"] for t in j.get("Teams", [])}
+    for ev in j["Events"]:
+        abbr = ev["EventDefinitionAbbr"]
+        disc = "DDCS" if abbr == "DDCS30" else abbr
+        al = AGE_LEVEL.get(ev["AgeGroupName"])
+        rows = []
+        for en in ev.get("Entries", []):
+            if en.get("IsDeleted") or not en.get("IsScored") or en.get("TotalScore") is None:
+                continue
+            parts = en.get("Participants") or []
+            if not parts:
+                continue
+            score = float(en["TotalScore"])
+            res = (en.get("EntryScoreData") or {}).get("result") or {}
+            fs = enrich.freestyle(res, enrich.judges_by_type(en)) if "D" in res else None
+            if fs:
+                rr = enrich.recompute_R(fs)
+                if rr is not None:
+                    ok = abs(rr - score) <= 0.011
+                    rcheck["shoda" if ok else "rozdíl"] += 1
+                    if not ok:
+                        rbad.append((comp, disc, score, rr))
+            tn = next((x.get("TeamName") for x in parts if x.get("TeamName")), None) or teams.get(parts[0].get("TeamID"))
+            perf = None
+            if disc in disc_names and al is not None:
+                aids = frozenset(aid_for(x, pinfo) for x in parts)
+                cand = perf_by_key.get((comp, disc, aids, score, al))
+                if cand:
+                    perf = cand.pop(0)
+                    if fs:
+                        perf["fs"] = fs
+                    elif res.get("m"):
+                        perf["sm"] = res["m"]
+            rows.append({"score": score, "ork": en.get("Rank"), "club": tn, "fs": fs, "perf": perf,
+                         "aids": sorted(aid_for(x, pinfo) for x in parts) if os.environ.get("DEBUG_UNMATCHED") else None})
+        if rows and disc in disc_names:
+            raw_events.append((comp, disc, ev["GenderName"], ev["AgeGroupName"], rows))
+
+for p in perfs:
+    if p["comp"] in json_comps:
+        coverage[p["comp"]][1] += 1
+
+perf_pos = {id(p): i for i, p in enumerate(perfs)}   # pořadí v payloadu se už nemění
+fields = []
+rank_check, rank_bad = Counter(), []
+merge_log = Counter()
+mixed_dropped = 0
+
+def _ranks(rows, is_fs):
+    tmp = [({"score": r["score"]}, r["fs"]) for r in rows]
+    mr = enrich.rank_group(tmp, is_fs)
+    return [mr[id(o)] for o, _ in tmp]
+
+def _rank_within(target, pool, is_fs):
+    """Umístění záznamů z target, kdyby se řadily mezi všechny záznamy pool."""
+    allr = _ranks(pool, is_fs)
+    pos = {id(r): allr[i] for i, r in enumerate(pool)}
+    return [pos[id(r)] for r in target]
+
+# Sloučené kategorie: pořadatel někdy malou kategorii vyhodnotí společně
+# s jinou (např. jediného kluka mezi holkami). V exportu to není napsané –
+# pozná se to tak, že oficiální pořadí nesedí s vlastním eventem. Pak se
+# hledá event téže soutěže, disciplíny a věku, se kterým sloučené pořadí
+# reprodukuje oficiální umístění PŘESNĚ. Jen tehdy se sloučení přijme.
+by_cda = defaultdict(list)
+for i, (comp, disc, gen, age, rows) in enumerate(raw_events):
+    by_cda[(comp, disc, age)].append(i)
+
+def _official(rows):
+    return [r["ork"] for r in rows]
+
+field_rows = {}   # index raw eventu -> (řádky pole, způsob)
+for i, (comp, disc, gen, age, rows) in enumerate(raw_events):
+    is_fs = any(r["fs"] for r in rows)
+    lcs = {r["perf"]["lc"] for r in rows if r["perf"]}
+    if len(lcs) > 1 or any(r["ork"] is None for r in rows):
+        continue
+    if _ranks(rows, is_fs) == _official(rows):
+        field_rows[i] = (rows, "official")
+        merge_log["samostatný event, sedí"] += 1
+        continue
+    found = None
+    others = [k for k in by_cda[(comp, disc, age)] if k != i]
+    tries = [[k] for k in others] + ([others] if len(others) > 1 else [])
+    for combo in tries:
+        pool = list(rows)
+        for k in combo:
+            pool += raw_events[k][4]
+        if _rank_within(rows, pool, is_fs) == _official(rows):
+            found = (pool, combo)
+            break
+    if found:
+        field_rows[i] = (found[0], "merged")
+        merge_log["sloučená kategorie, potvrzeno"] += 1
+    else:
+        field_rows[i] = (rows, "official-unverified")
+        merge_log["oficiální pořadí nejde zreprodukovat"] += 1
+
+for i, (comp, disc, gen, age, rows) in enumerate(raw_events):
+    is_fs = any(r["fs"] for r in rows)
+    lcs = {r["perf"]["lc"] for r in rows if r["perf"]}
+    if i in field_rows:
+        pool, how = field_rows[i]
+        # kontrola: umístění každého záznamu = oficiální
+        for r in rows:
+            if how == "official-unverified":
+                rank_check["nejde zreprodukovat"] += 1
+                rank_bad.append((comp, disc, gen, age, r["score"], r["ork"]))
+            else:
+                rank_check["shoda"] += 1
+        lc = next(iter(lcs)) if lcs else None
+        groups = [(lc, rows, pool, how)]
+    else:
+        groups = []
+        for lc in sorted(lcs):
+            sub = [r for r in rows if r["perf"] and r["perf"]["lc"] == lc]
+            groups.append((lc, sub, sub, "computed"))
+        mixed_dropped += sum(1 for r in rows if not r["perf"])
+
+    for lc, own, pool, how in groups:
+        # umístění vlastních záznamů: oficiální, nebo dopočtené v rámci úrovně
+        if how == "computed":
+            own_pl = _ranks(own, is_fs)
+            pool_pl = own_pl
+        else:
+            own_pl = [r["ork"] for r in own]
+            pool_pl = [r["ork"] for r in pool] if how == "official" or how == "official-unverified" \
+                else _ranks(pool, is_fs)
+        # v sloučeném poli zobrazujeme pořadí sloučeného pole, ale vlastní
+        # záznamy mají oficiální umístění (ověřené výš)
+        if how == "merged":
+            pos = {id(r): pl for r, pl in zip(pool, pool_pl)}
+            for r, pl in zip(own, own_pl):
+                pos[id(r)] = pl
+            pool_pl = [pos[id(r)] for r in pool]
+        order_ = sorted(range(len(pool)), key=lambda k: (pool_pl[k] if pool_pl[k] is not None else 10**6, -pool[k]["score"]))
+        fi = len(fields)
+        entries = []
+        own_ids = {id(r) for r in own}
+        for k in order_:
+            r = pool[k]
+            entries.append([r["score"], pool_pl[k], cidx(r["club"]), _mini(r["fs"]),
+                            perf_pos.get(id(r["perf"]), -1) if r["perf"] else -1])
+        for r, pl in zip(own, own_pl):
+            if r["perf"]:
+                r["perf"]["fv"] = fi
+                r["perf"]["pl"] = pl
+        fields.append([comp, disc, gen, age, lc, {"official": 1, "merged": 2, "computed": 0, "official-unverified": 3}[how], entries])
+
+for p in perfs:
+    if p["comp"] in json_comps and "fv" in p:
+        coverage[p["comp"]][0] += 1
+
+if os.environ.get("DEBUG_UNMATCHED"):
+    left = [p for p in perfs if p["comp"] in json_comps and "fv" not in p]
+    # co zbylo nespárované na straně exportu se stejným (soutěž, disciplína, skóre, věk)
+    for p in left[:25]:
+        cands = []
+        for comp_, disc_, gen_, age_, rows_ in raw_events:
+            if comp_ == p["comp"] and disc_ == p["disc"] and AGE_LEVEL.get(age_) == p.get("al"):
+                for r in rows_:
+                    if r["score"] == p["score"] and not r["perf"]:
+                        cands.append(r)
+        print("NESPÁROVÁNO", p["comp"][:16], p["disc"], p["score"], p.get("al"),
+              [m["name"] + ":" + m["aid"] for m in p["members"]], "| v exportu:", [c["aids"] for c in cands][:2])
+
 # ---------------------------------------------------------------- dopočty
 # athCat = nejnižší věková kategorie, ve které závodník nastoupil.
 # Hodnoty z legacy.json se berou jako dané a nepřepisují se – jsou ověřené.
@@ -322,6 +581,8 @@ payload = {
     "athCat": ath_cat,
     "athCatNext": next_cat,
     "nextSeason": next_season,
+    "fields": fields,
+    "clubs": clubs_tbl,
     "perfs": perfs,
 }
 
@@ -332,6 +593,11 @@ if "__DATA__" not in tpl:
 blob = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
 if "</script" in blob.lower():
     die("data obsahují </script, to by rozbilo stránku")
+# modul rozboru (analyza.js) se vkládá do stránky při buildu – jediný zdroj
+ANALYZA = os.path.join(ROOT, "analyza.js")
+if "/*__ANALYZA__*/" not in tpl:
+    die("template.html neobsahuje značku /*__ANALYZA__*/")
+tpl = tpl.replace("/*__ANALYZA__*/", open(ANALYZA, encoding="utf-8").read())
 html = tpl.replace("__DATA__", blob)
 
 print("=== BUILD RANKINGU ===")
@@ -350,6 +616,14 @@ if cat_warnings:
     for aid, had, low in cat_warnings:
         nm = next((m["name"] for p in perfs for m in p["members"] if m["aid"] == aid), aid)
         print("      %s (%s): zapsáno %s, nastoupil v %s" % (nm, aid, had, low))
+if id_conflict:
+    print("  POZOR – ID z exportu patří v datech jinému člověku, NEPŘIŘAZENO (%d):" % len(id_conflict))
+    for (mid, nm), who in sorted(id_conflict.items(), key=lambda x: x[0][1]):
+        print("      %s má v exportu %s, to ale v datech patří: %s" % (nm, mid, ", ".join(who)))
+if id_unified:
+    print("  sjednocená ID – v exportu jiné členské ID než v datech, spárováno podle jména (%d):" % len(id_unified))
+    for (mid, nm), canon in sorted(id_unified.items(), key=lambda x: x[0][1]):
+        print("      %s: %s → %s" % (nm, mid, canon))
 if new_aids:
     print("  noví závodníci bez členského ID (%d):" % len(new_aids))
     for nm, aid in sorted(new_aids.items()):
@@ -360,6 +634,19 @@ if next_cat:
 else:
     print("  kategorie pro příští sezónu: data/kategorie.json není, blok o přechodu se nezobrazí")
 print("  rozhodné období se počítá v prohlížeči z aktuálního data, data generována %s" % generated)
+print("\n=== ROZBOR ===")
+for comp in sorted(coverage, key=lambda c: order.get(c, "")):
+    a, b = coverage[comp]
+    print("  %-34s spárováno %4d / %4d výkonů%s" % (comp, a, b, "" if a == b else "  ← NEÚPLNÉ"))
+print("  polí (eventů po úrovních): %d · freestyle s rozpadem: %d" % (len(fields), sum(1 for p in perfs if "fs" in p)))
+print("  ve smíšených eventech vynecháno záznamů bez úrovně: %d" % mixed_dropped)
+print("  kontrola R = složky podle IJRU:          %s" % dict(rcheck))
+for x in rbad[:10]:
+    print("      ROZDÍL %s %s oficiálně %s, přepočet %s" % x)
+print("  eventy:                                 %s" % dict(merge_log))
+print("  kontrola umístění vs. oficiální:         %s" % dict(rank_check))
+for x in rank_bad[:15]:
+    print("      NEJDE %s %s %s %s skóre %s: oficiálně %s." % x)
 
 if CHECK:
     print("\n--check: index.html nezapsán")

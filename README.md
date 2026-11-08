@@ -73,7 +73,8 @@ netipuje.
 
 - **Ranking** – nominační pořadí, součet dvou nejlepších
 - **Limity** – splnění kvalifikačních limitů, přepínač MS/ME × MČR
-- **Karta** – karta závodnice, celá historie a graf posunu po disciplínách
+- **Karta** – rozbor závodnice: kde velí a kde zabrat, na co se zaměřit,
+  vývoj v čase a rozbor posledního závodu v každé disciplíně
 - **Závody** – podklad na povídání o výsledcích po závodě
 
 ### Závody
@@ -93,6 +94,80 @@ výkony. To je podklad na řeč o tom, co je čeká – hlavně u přechodu 9–
 Rozhodné období se tu **neuplatňuje** – porovnává se s celou historií.
 U týmových disciplín se porovnává s vlastním předchozím výkonem v disciplíně,
 i když mohla být sestava jiná.
+
+## Rozbor závodnice (Karta)
+
+**Kde velíš a kde zabrat** – postavení v ČR v každé disciplíně podle nejlepšího
+výkonu za rozhodné období, proti všem českým závodníkům (u týmových disciplín
+týmům) ve stejné kategorii a pohlaví. Stupně: Špička ČR (top 3), Silná stránka
+(horní čtvrtina), Střed, Rezerva. Zahraniční oddíly se sem nepočítají.
+
+**Na co se zaměřit** – doporučení z posledního závodu v každé disciplíně, jen
+věci doložitelné čísly, seřazené podle toho, co přinesou:
+
+1. chyby „zadarmo“ – porušení času/prostoru, chybný start
+2. nesplněné povinné prvky
+3. bedna na dosah – u rychlosti malý odstup, u freestylu „bez chyb na bedně“
+4. čistota – missy a breaky podle podílu ztracené sestavy
+5. limit na dosah
+6. obtížnost výrazně pod bednou (s nejslabší částí obtížnosti)
+7. o místo výš, když nejde o bednu
+
+**Rozbor posledního závodu** u každé disciplíny:
+
+- umístění a **odstup na místo výš, na bednu a na 1. místo** i s oddílem
+- u freestylu tabulka D, P, Q, srážky a výsledek proti bedně a vítězi
+  (když vyhrála, proti druhému místu)
+- **kolik stály chyby**: missy, jejich vliv na prezentaci, breaky, porušení,
+  nesplněné povinné prvky; a **odhad bez chyb** i s umístěním
+- podrobně: obtížnost podle částí (power/gymnastika, multiples, rope
+  manipulation; u DD jumper/turner) proti českým závodníkům na bedně,
+  prezentace po pěti kategoriích, rozložení úrovní prvků
+
+### Odkud se to bere a co je přesné
+
+Všechno je z oficiálních výsledků (`EntryScoreData`) a z výsledků jednotlivých
+rozhodčích, které počítá samotný výsledkový systém (`JudgeResults`,
+`TallySheet`). Typ rozhodčího: `P` prezentace, `T` technický, `Dp`/`Dm`/`Dr`
+obtížnost SR, `Da`/`Db` Wheel, `Dj`/`Dt` Double Dutch.
+
+**Přesné:** umístění, odstupy, D/P/Q/M, ztráty srážkami a povinnými prvky
+(z oficiálních složek: R = D × (1 + P) × Q × M, u DD bez Q).
+**Odhad** (v appce označený): vliv missů na prezentaci a „bez chyb“ – počítá se
+s tím, že rozhodčí prezentace za každý miss strhli bod v každé kategorii;
+ořez škály 0–24 se zanedbává.
+
+**Umístění** je vždy proti **celému oficiálnímu poli včetně zahraničních**
+oddílů – tak, jak to bylo ve výsledkovce. Dvě zvláštnosti:
+
+- **sloučené kategorie** – pořadatel malou kategorii někdy vyhodnotí společně
+  s jinou (třeba jediného kluka mezi holkami). V exportu to napsané není.
+  Build sloučení najde tak, že vyzkouší, se kterým eventem sloučené pořadí
+  reprodukuje oficiální umístění přesně, a jen tehdy ho přijme.
+- **smíšené soutěže A + B** – oficiální pořadí v exportu je společné, ale
+  vyhlašuje se zvlášť. Umístění se tu dopočítá v rámci úrovně podle IJRU
+  (rychlost: shoda = stejné místo; freestyle: tie-break M → Q → P → D).
+
+### Kontroly, které build vypisuje
+
+V sekci `=== ROZBOR ===` musí být:
+
+- spárováno **N / N** u každé soutěže s exportem
+- `kontrola R = složky podle IJRU` – jen `shoda`
+- `kontrola umístění vs. oficiální` – jen `shoda`
+
+Stav k 8. 11. 2026: 3 681 / 3 681 výkonů, 656 / 656 freestylů, 3 808 / 3 808
+umístění, 88 sloučených kategorií. Nezávislá kontrola v Pythonu přímo ze
+surových výsledků (mimo build) na 398 náhodných výkonech: 0 nesrovnalostí
+v umístění, odstupech i ztrátách.
+
+### Identita závodníků
+
+Členská ID v exportech nejsou spolehlivá: stejný člověk má v různých soutěžích
+různá ID, někdy žádné, a výjimečně ID, které v datech patří někomu jinému
+(Nina Tůmová má v exportu Mini Cupu ID Valérie Vojtěškové). ID se proto
+věří, jen když souhlasí se jménem; jinak rozhoduje jméno. Build vypisuje
+každé **sjednocení** a každý **konflikt** – projdi je, než výsledek pushneš.
 
 ## Jak se počítá ranking a limity
 
