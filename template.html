@@ -240,6 +240,7 @@ header{position:sticky;top:0;z-index:30;background:var(--navy);color:#fff;box-sh
 .dRow{display:grid;grid-template-columns:minmax(130px,190px) auto 1fr;gap:4px 12px;align-items:baseline;padding:7px 0;border-top:1px dashed var(--line);font-size:15px}
 .dRow:first-child{border-top:0}
 .dRow .k{color:var(--ink);opacity:.8;font-size:14.5px}.dRow .v{font-family:Poppins,sans-serif;font-weight:600}.dRow .n{font-size:13.5px;color:var(--muted)}
+.dRow.dim{opacity:.6}
 .dRow.warn .v{color:var(--warn)}.dRow.bad .v{color:var(--bad)}.dRow.good .v{color:var(--ok)}
 .dRow .up{color:var(--ok);font-weight:600}.dRow .down{color:var(--bad);font-weight:600}
 .dFs{margin-top:10px;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:8px 14px}
@@ -797,8 +798,8 @@ function conclusions(S,clubs){
   }
   {const pod=[...S.athMap.values()].map(a=>({a,ov:overallFor(a.aid,S.comp)})).filter(x=>x.ov&&x.ov.me.rk<=3)
       .sort((x,y)=>x.ov.al-y.ov.al||x.ov.me.rk-y.ov.me.rk);
-    const OA=overallAll(S.comp);const pa=[...S.athMap.keys()].map(k=>OA.get(k)).filter(o=>o&&o.grp.length>=2&&o.rk<=3).sort((x,y)=>x.cat-y.cat||x.rk-y.rk);
-    if(pa.length)out.push({i:'🏅',t:'Overall všech disciplín (body za umístění, i týmové): '+pa.map(o=>MED[o.rk]+' <b>'+esc(o.name)+'</b> ('+catLabelLvl(o.cat)+(o.gen?' '+genLabel(o.gen):'')+', z '+o.grp.length+')').join(' · ')});
+    const OA=overallAll(S.comp);const pa=[...S.athMap.keys()].map(k=>OA.get(k)).filter(o=>o&&o.rk!=null&&o.grp.length>=2&&o.rk<=3).sort((x,y)=>x.cat-y.cat||x.rk-y.rk);
+    if(pa.length)out.push({i:'🏅',t:'Overall všech disciplín (průměr 4 nejlepších startů, i týmové): '+pa.map(o=>MED[o.rk]+' <b>'+esc(o.name)+'</b> ('+catLabelLvl(o.cat)+(o.gen?' '+genLabel(o.gen):'')+', z '+o.grp.length+')').join(' · ')});
     if(pod.length)out.push({i:'🏆',t:'Overall individuálních disciplín (dopočtený, srovnání se závodníky se stejnými disciplínami): '+pod.map(x=>MED[x.ov.me.rk]+' <b>'+esc(x.a.name)+'</b> ('+catLabelLvl(x.ov.al)+', z '+x.ov.n+')').join(' · ')});}
   if(S.withHist.length){
     const up=S.withHist.filter(e=>e.delta>0).length;
@@ -872,6 +873,7 @@ function overallBlock(ov,a){
    jako v overallu. Pořadí v kategorii a pohlaví mezi všemi českými závodníky
    závodu; při shodě rozhoduje vyšší průměr na start. */
 const _ovAll={};
+const OV_K=4,OV_MIN=3; /* hodnotí se 4 nejlepší starty, do pořadí jen s aspoň 3 starty */
 const ovPts=r=>{const f=fieldOf(r);if(!f||!r.pl)return null;const N=f.e.length;return N<=1?100:100*(N-r.pl)/(N-1);};
 function overallAll(comp){
   if(_ovAll[comp])return _ovAll[comp];
@@ -883,28 +885,30 @@ function overallAll(comp){
       const a=m.get(mm.aid);a.st.push({r,pts});a._al.push(r.al);if(r.gender==='Female'||r.gender==='Male')a._g.push(r.gender);});});
   m.forEach(a=>{if(a.cat==null){const c={};a._al.forEach(x=>c[x]=(c[x]||0)+1);a.cat=+Object.keys(c).sort((x,y)=>c[y]-c[x])[0];}
     if(!a.gen&&a._g.length)a.gen=a._g.every(g=>g===a._g[0])?a._g[0]:null;
-    a.sum=a.st.reduce((t,s)=>t+s.pts,0);a.avg=a.sum/a.st.length;});
+    a.sum=a.st.reduce((t,s)=>t+s.pts,0);a.avg=a.sum/a.st.length;
+    const top=[...a.st].sort((x,y)=>y.pts-x.pts).slice(0,OV_K);a.topIdx=new Set(top);a.score=top.reduce((t,s)=>t+s.pts,0)/top.length;});
   const groups=new Map();m.forEach(a=>{const k=a.cat+'|'+a.gen;if(!groups.has(k))groups.set(k,[]);groups.get(k).push(a);});
-  groups.forEach(g=>{g.sort((x,y)=>y.sum-x.sum||y.avg-x.avg);
-    g.forEach((a,i)=>{a.rk=i>0&&Math.abs(g[i-1].sum-a.sum)<1e-9&&Math.abs(g[i-1].avg-a.avg)<1e-9?g[i-1].rk:i+1;a.grp=g;});});
+  groups.forEach(all=>{const g=all.filter(a=>a.st.length>=OV_MIN);
+    g.sort((x,y)=>y.score-x.score||y.avg-x.avg||y.st.length-x.st.length);
+    g.forEach((a,i)=>{const p=g[i-1];a.rk=p&&Math.abs(p.score-a.score)<1e-9&&Math.abs(p.avg-a.avg)<1e-9&&p.st.length===a.st.length?p.rk:i+1;});
+    all.forEach(a=>{a.grp=g;a.all=all.length;if(a.st.length<OV_MIN)a.rk=null;});});
   _ovAll[comp]=m;return m;
 }
 function overallAllBlock(aid,comp){
-  const a=overallAll(comp).get(aid);if(!a||a.grp.length<2)return '';
+  const a=overallAll(comp).get(aid);if(!a)return '';
   const g=a.grp,r1=x=>fmt(Math.round(x*10)/10);
+  if(a.rk==null)return '<div class="dOv"><div class="t">Overall všech disciplín</div><div class="s">Do overallu se počítají závodníci s aspoň '+OV_MIN+' starty, tady '+cz(a.st.length,'byl jen','byly jen','bylo jen')+' '+a.st.length+'.</div></div>';
+  if(g.length<2)return '';
   let h='<div class="dOv"><div class="dOvTop"><div><div class="t">Overall všech disciplín</div>'+
-    '<div class="s">'+catLabelLvl(a.cat)+(a.gen?' · '+genLabel(a.gen):'')+' · individuální i týmové disciplíny · '+g.length+' '+cz(g.length,'závodník','závodníci','závodníků')+' v kategorii</div></div>'+
-    '<div class="big">'+(a.rk<=3?MED[a.rk]+' ':'')+'<b>'+a.rk+'.</b><span> z '+g.length+'</span></div></div>';
-  if(a.st.length>=3){const g3=g.filter(o=>o.st.length>=3).sort((x,y)=>y.avg-x.avg);const ra=1+g3.filter(o=>o.avg>a.avg+1e-9).length;
-    h+='<div class="dOvAvg">Podle průměru na start (bez ohledu na počet disciplín): <b>'+ra+'. z '+g3.length+'</b> mezi závodníky s aspoň 3 starty</div>';}
-  h+='<div class="dList">';
-  [...a.st].sort((x,y)=>discOrd(x.r.disc)-discOrd(y.r.disc)).forEach(s=>{const f=fieldOf(s.r);
-    h+=dlRow(esc(dcName(s.r.disc))+(TEAM.has(s.r.disc)?' <span class="x2">tým</span>':''),'<b>'+r1(s.pts)+'</b>',s.r.pl+'. z '+f.e.length);});
-  h+=dlRow('Celkem bodů','<b>'+r1(a.sum)+'</b>',a.st.length+' '+cz(a.st.length,'start','starty','startů')+' · průměr '+r1(a.avg)+' na start');
+    '<div class="s">'+catLabelLvl(a.cat)+(a.gen?' · '+genLabel(a.gen):'')+' · individuální i týmové disciplíny · hodnotí se '+OV_K+' nejlepší starty · '+g.length+' '+cz(g.length,'závodník','závodníci','závodníků')+' s aspoň '+OV_MIN+' starty</div></div>'+
+    '<div class="big">'+(a.rk<=3?MED[a.rk]+' ':'')+'<b>'+a.rk+'.</b><span> z '+g.length+'</span></div></div><div class="dList">';
+  [...a.st].sort((x,y)=>discOrd(x.r.disc)-discOrd(y.r.disc)).forEach(s=>{const f=fieldOf(s.r),inn=a.topIdx.has(s);
+    h+=dlRow(esc(dcName(s.r.disc))+(TEAM.has(s.r.disc)?' <span class="x2">tým</span>':''),'<b>'+r1(s.pts)+'</b>',s.r.pl+'. z '+f.e.length+(inn?' · <span class="up">započteno</span>':''),inn?'':' dim');});
+  h+=dlRow('Overall body','<b>'+r1(a.score)+'</b>','průměr '+Math.min(OV_K,a.st.length)+' nejlepších startů z '+a.st.length);
   h+='</div><div class="dOvList">';
   let last=0;g.filter(o=>o.rk<=3||Math.abs(o.rk-a.rk)<=1).forEach(o=>{if(last&&o.rk>last+1)h+='<div class="gap">…</div>';last=o.rk;
-    h+='<div class="ovRow'+(o.aid===aid?' me':'')+'"><span class="r">'+o.rk+'.</span><span class="nm">'+esc(o.name)+' <span class="c">'+esc(o.club||'')+' · '+o.st.length+'×</span></span><span class="tt">'+r1(o.sum)+'</span></div>';});
-  h+='</div><div class="dOvNote">Body za každý start podle umístění v celém poli: vítěz 100, poslední 0, mezi tím rovnoměrně (např. 3. z 11 = 80). Týmová disciplína se započítá každému členovi týmu. Body se sčítají, takže víc disciplín znamená víc šancí – jako v overallu. Při shodě rozhoduje průměr na start. Pořadí podle průměru ukazuje kvalitu startů bez ohledu na jejich počet. Zahraniční závodníci v pořadí nejsou, ale v umístěních ano.</div></div>';
+    h+='<div class="ovRow'+(o.aid===aid?' me':'')+'"><span class="r">'+o.rk+'.</span><span class="nm">'+esc(o.name)+' <span class="c">'+esc(o.club||'')+' · '+o.st.length+' startů</span></span><span class="tt">'+r1(o.score)+'</span></div>';});
+  h+='</div><div class="dOvNote">Body za každý start podle umístění v celém poli: vítěz 100, poslední 0, mezi tím rovnoměrně (např. 3. z 11 = 80). Týmová disciplína se počítá každému členovi týmu. Hodnotí se průměr '+OV_K+' nejlepších startů – kdo některé disciplíny vynechal, není penalizovaný, a víc slabších startů nic nepřidá. Do pořadí jen závodníci s aspoň '+OV_MIN+' starty. Při shodě rozhoduje průměr ze všech startů, pak počet startů. Zahraniční závodníci v pořadí nejsou, ale v umístěních ano.</div></div>';
   return h;
 }
 const REPRE=new Set(DATA.repre||[]);
@@ -1008,7 +1012,7 @@ function athDetail(a,S){
   const ov=overallFor(a.aid,S.comp);
   h+=overallAllBlock(a.aid,S.comp);
   h+=overallBlock(ov,a);
-  {const oa=overallAll(S.comp).get(a.aid);if(oa&&oa.grp.length>=2&&oa.rk<=3)acc.good.push('<b>Overall všech disciplín</b>: '+oa.rk+'. místo z '+oa.grp.length);}
+  {const oa=overallAll(S.comp).get(a.aid);if(oa&&oa.rk!=null&&oa.grp.length>=2&&oa.rk<=3)acc.good.push('<b>Overall všech disciplín</b>: '+oa.rk+'. místo z '+oa.grp.length);}
   if(ov&&ov.me.rk<=3)acc.good.push('<b>Overall individuálních disciplín</b>: '+ov.me.rk+'. místo z '+ov.n);
   a.items.forEach(ev=>{h+=startBlock(a,ev,S.cd,acc);});
   if(moves){
