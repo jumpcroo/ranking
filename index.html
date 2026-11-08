@@ -1132,7 +1132,7 @@ function conclusions(S,clubs){
   {const pod=[...S.athMap.values()].map(a=>({a,ov:overallFor(a.aid,S.comp)})).filter(x=>x.ov&&x.ov.me.rk<=3)
       .sort((x,y)=>x.ov.al-y.ov.al||x.ov.me.rk-y.ov.me.rk);
     const OA=overallAll(S.comp);const pa=[...S.athMap.keys()].map(k=>OA.get(k)).filter(o=>o&&o.rk!=null&&o.grp.length>=2&&o.rk<=3).sort((x,y)=>x.cat-y.cat||x.rk-y.rk);
-    if(pa.length)out.push({i:'🏅',t:'Overall všech disciplín (průměr 4 nejlepších startů, i týmové): '+pa.map(o=>MED[o.rk]+' <b>'+esc(o.name)+'</b> ('+catLabelLvl(o.cat)+(o.gen?' '+genLabel(o.gen):'')+', z '+o.grp.length+')').join(' · ')});
+    if(pa.length)out.push({i:'🏅',t:'Overall – 4 nejlepší starty (i týmové disciplíny): '+pa.map(o=>MED[o.rk]+' <b>'+esc(o.name)+'</b> ('+catLabelLvl(o.cat)+(o.gen?' '+genLabel(o.gen):'')+', z '+o.grp.length+')').join(' · ')});
     if(pod.length)out.push({i:'🏆',t:'Overall individuálních disciplín (dopočtený, srovnání se závodníky se stejnými disciplínami): '+pod.map(x=>MED[x.ov.me.rk]+' <b>'+esc(x.a.name)+'</b> ('+catLabelLvl(x.ov.al)+', z '+x.ov.n+')').join(' · ')});}
   if(S.withHist.length){
     const up=S.withHist.filter(e=>e.delta>0).length;
@@ -1345,7 +1345,7 @@ function athDetail(a,S){
   const ov=overallFor(a.aid,S.comp);
   h+=overallAllBlock(a.aid,S.comp);
   h+=overallBlock(ov,a);
-  {const oa=overallAll(S.comp).get(a.aid);if(oa&&oa.rk!=null&&oa.grp.length>=2&&oa.rk<=3)acc.good.push('<b>Overall všech disciplín</b>: '+oa.rk+'. místo z '+oa.grp.length);}
+  {const oa=overallAll(S.comp).get(a.aid);if(oa&&oa.rk!=null&&oa.grp.length>=2&&oa.rk<=3)acc.good.push('<b>Overall (4 nejlepší starty)</b>: '+oa.rk+'. místo z '+oa.grp.length);}
   if(ov&&ov.me.rk<=3)acc.good.push('<b>Overall individuálních disciplín</b>: '+ov.me.rk+'. místo z '+ov.n);
   a.items.forEach(ev=>{h+=startBlock(a,ev,S.cd,acc);});
   if(moves){
