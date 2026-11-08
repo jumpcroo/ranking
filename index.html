@@ -1016,6 +1016,7 @@ function fsDetail(p){
    sezóny 2027 (data/kategorie.json). Pořadí v nové kategorii je odhad: ostatní
    oddíly počítáme v jejich dnešní kategorii, protože jejich ročníky neznáme. */
 const PLAN=DATA.plan||null;
+const SHOW_GOALS=false;
 function winFromOf(d){const y=+d.slice(0,4),m=+d.slice(5,7);let mm=m-10,yy=y;while(mm<1){mm+=12;yy--;}return yy+'-'+String(mm).padStart(2,'0')+'-01';}
 const todayIso=()=>{const t=new Date();return t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');};
 const daysTo=d=>Math.round((new Date(d+'T12:00:00')-new Date(todayIso()+'T12:00:00'))/864e5);
@@ -1086,7 +1087,7 @@ function renderPlan(host,a){
   const R=planRows(a);if(!R||!R.rows.length)return;
   const u=(r,x)=>r.sp?skoky(x):body(x);
   /* Cíle na příští závod */
-  const nx=R.rows.filter(r=>r.atNext);
+  const nx=SHOW_GOALS?R.rows.filter(r=>r.atNext):[]; /* cíle zatím vypnuté – čekají na lepší rozpracování */
   if(nx.length){const c=document.createElement('div');c.className='anCard plCard';
     const dt=daysTo(R.nc.date);
     let h='<div class="anH">🎯 Cíle na '+esc(R.nc.name)+'</div><div class="anSub">'+czDate(R.nc.date)+(dt>0?' · za '+dt+' '+cz(dt,'den','dny','dní'):' · dnes')+' · '+esc(R.nc.note||'')+' · úroveň '+esc(R.nc.levels||'')+'. Do rankingu se počítá jen start na A.</div>';
