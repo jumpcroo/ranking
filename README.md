@@ -71,9 +71,9 @@ netipuje.
 - **Ranking** – nominační pořadí, součet dvou nejlepších
 - **Limity** – splnění kvalifikačních limitů, přepínač MS/ME × MČR
 - **Karta** – karta závodnice, celá historie a graf posunu po disciplínách
-- **Posun** – podklad na povídání o výsledcích po závodě
+- **Zhodnocení soutěže** – podklad na povídání o výsledcích po závodě
 
-### Posun
+### Zhodnocení soutěže
 
 Vybere se závod a u každé závodnice se ukáže, co zajela a o kolik se posunula
 proti svému poslednímu výkonu v téže disciplíně. Označí se osobní rekord, první

@@ -28,8 +28,9 @@ header{position:sticky;top:0;z-index:30;background:var(--navy);color:#fff;box-sh
 .hbar{max-width:1120px;margin:0 auto;padding:10px 12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:9px;font-family:Poppins;font-weight:700;font-size:17px}
 .dot{width:26px;height:26px;border-radius:50%;background:#fff;color:var(--navy);display:grid;place-items:center;font-family:Poppins;font-weight:700;font-size:12px;flex:none}
-.modeToggle{margin:0 auto;display:flex;background:rgba(255,255,255,.15);border-radius:999px;padding:3px;gap:2px}
-.modeToggle button{border:0;background:transparent;color:#fff;padding:8px 15px;border-radius:999px;font-weight:600;font-size:13.5px;min-height:38px}
+.modeToggle{margin:0 auto;display:flex;flex-wrap:wrap;justify-content:center;max-width:100%;background:rgba(255,255,255,.15);border-radius:22px;padding:3px;gap:2px}
+.modeToggle button{border:0;background:transparent;color:#fff;padding:8px 15px;border-radius:999px;font-weight:600;font-size:13.5px;min-height:38px;white-space:nowrap}
+@media(max-width:520px){.modeToggle button{padding:8px 11px;font-size:12.5px}}
 .modeToggle button[aria-pressed="true"]{background:#fff;color:var(--navy)}
 .controls{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:12px;margin-top:12px}
 .search{display:flex;align-items:center;gap:8px;background:var(--surface-2);border:1px solid var(--line);border-radius:11px;padding:10px 12px}
@@ -166,7 +167,7 @@ header{position:sticky;top:0;z-index:30;background:var(--navy);color:#fff;box-sh
 </style></head><body>
 
 <header><div class="hbar">
-  <div class="modeToggle" role="tablist"><button id="mRank" aria-pressed="true">Ranking</button><button id="mLim" aria-pressed="false">Limity</button><button id="mKarta" aria-pressed="false">Karta</button><button id="mPosun" aria-pressed="false">Posun</button></div>
+  <div class="modeToggle" role="tablist"><button id="mRank" aria-pressed="true">Ranking</button><button id="mLim" aria-pressed="false">Limity</button><button id="mKarta" aria-pressed="false">Karta</button><button id="mPosun" aria-pressed="false">Zhodnocení soutěže</button></div>
 </div></header>
 
 <div class="wrap">
