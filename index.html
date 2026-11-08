@@ -1113,7 +1113,8 @@ function conclusions(S,clubs){
     const fsAll=S.ours.filter(r=>r.fs).map(r=>fsAnalysis(r)).filter(Boolean);
     if(fsAll.length){const lost=fsAll.reduce((s,a)=>s+a.loss.miss+a.loss.brk+a.loss.viol+a.loss.req,0);
       const clean=fsAll.filter(a=>a.M>=1&&a.Q>=1).length;
-      out.push({i:'🎼',t:'Freestyle: '+clean+' z '+fsAll.length+' '+cz(fsAll.length,'sestavy','sestav','sestav')+' bez srážek a se všemi povinnými prvky. Srážky a nesplněné prvky stály dohromady '+body(lost)+'.'});}
+      const nm_=fsAll.reduce((t,a)=>t+(a.fs.am||0),0),nb_=fsAll.reduce((t,a)=>t+(a.fs.ab||0),0);
+      out.push({i:'🎼',t:'Freestyle: '+clean+' z '+fsAll.length+' '+cz(fsAll.length,'sestavy','sestav','sestav')+' bez srážek a se všemi povinnými prvky. Celkem <b>'+fmt(nm_)+' '+cz(nm_,'chyba','chyby','chyb')+'</b> a <b>'+fmt(nb_)+' '+cz(nb_,'break','breaky','breaků')+'</b>; srážky a nesplněné prvky stály dohromady '+body(lost)+'.'});}
   }
   if(S.withHist.length){
     const up=S.withHist.filter(e=>e.delta>0).length;
@@ -1174,6 +1175,10 @@ function startBlock(a,ev,cd,acc){
     if(r.fs.fm!=='dd')h+=dlRow('Povinné prvky','<b>'+pct(Q)+'</b>',cmpNote(Q,A('Q'),true,x=>pct(x)),Q<1?' warn':'');
     h+=dlRow('Srážky','<b>'+(M>=1?'0 %':'−'+pct(1-M))+'</b>',cmpNote(1-M,A('M')==null?null:1-A('M'),false,x=>pct(x)),M<1?' warn':'');
     if(fa){const L=fa.loss,parts=[];
+      const cnt=(n,a,b,c)=>fmt(n)+'× '+(Number.isInteger(n)?cz(n,a,b,c):b);
+      h+=dlRow('Počet chyb','<b>'+fmt(r.fs.am||0)+'</b>',(r.fs.am?cnt(r.fs.am,'chyba','chyby','chyb'):'bez chyb')+' · průměr rozhodčích');
+      if(r.fs.fm!=='dd'||r.fs.ab)h+=dlRow('Počet breaků','<b>'+fmt(r.fs.ab||0)+'</b>',r.fs.fm==='dd'?'v Double Dutch se za breaky nestrhává':'');
+      if(r.fs.av)h+=dlRow('Porušení času / prostoru','<b>'+fmt(r.fs.av)+'</b>','');
       if(L.miss>0.005)parts.push('chyby −'+fmt(L.miss));if(L.brk>0.005)parts.push('breaky −'+fmt(L.brk));
       if(L.viol>0.005)parts.push('porušení −'+fmt(L.viol));if(L.req>0.005)parts.push('povinné prvky −'+fmt(L.req));
       if(parts.length)h+=dlRow('Kolik stály chyby',parts.join('<br>'),'');
