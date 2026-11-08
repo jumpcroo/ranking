@@ -1066,7 +1066,12 @@ function planRows(a){
       if(lm!=null&&(best==null||best<lm))goals.push({k:'Limit MČR',x:lm,gap:best==null?null:lm-best});
       if(ls!=null&&showMs(a.aid,cat27)&&(best==null||best<ls))goals.push({k:'Limit ME/MS',x:ls,gap:best==null?null:ls-best});
       const os=ref.others;const tgt=[];
-      if(ref.rk>1)tgt.push({k:ref.rk-1,lab:'o místo výš'});
+      const cnt=self?self.tt.length:0;
+      if(cnt<2){/* jen jedno (nebo žádné) áčko: každý další výsledek se přičte – ukázat, kam by ji posunulo zopakování nejlepšího */
+        const rep=best!=null?best:pb,S2=(self?self.sum:0)+rep;
+        const rk2=1+os.filter(o=>o.sum>S2).length;
+        goals.push({k:(cnt?'Druhé':'První')+' áčko',x:rep,rank:true,info:'když zopakuješ '+fmt(rep)+', posuneš se na '+rk2+'. místo (teď '+ref.rk+'.)'});}
+      else if(ref.rk>1)tgt.push({k:ref.rk-1,lab:'o místo výš'});
       if(ref.rk>4)tgt.push({k:3,lab:'na 3. místo'});
       if(ref.rk>2)tgt.push({k:1,lab:'na 1. místo'});
       tgt.forEach(t=>{const o=os[t.k-1];if(!o)return;const x=needToPass(self,o);if(x==null)return;
@@ -1089,7 +1094,7 @@ function renderPlan(host,a){
       if(!r.goals.length)h+='<span class="plGoal ok">✔ limity splněné'+(r.now.rk===1?' a 1. v ČR':'')+' – drž formu</span>';
       r.goals.forEach(g=>{const hard=g.x>r.pb;
         h+='<div class="plGoal'+(g.rank?' rk':'')+'"><span class="k">'+g.k+'</span><span class="x">'+fmt(g.x)+'+</span><span class="n">'+
-          (g.rank?'předběhneš '+esc(g.who||''):(g.gap!=null?'chybí '+u(r,g.gap):'zatím bez výsledku'))+
+          (g.info?g.info:g.rank?'předběhneš '+esc(g.who||''):(g.gap!=null?'chybí '+u(r,g.gap):'zatím bez výsledku'))+
           (hard?' · <span class="hard">nad osobákem o '+u(r,g.x-r.pb)+'</span>':' · <span class="ok">zvládneš osobákem</span>')+'</span></div>';});
       h+='</div></div>';});
     h+='<div class="anFoot">Ranking = součet dvou nejlepších áček od '+czDate(R.from)+' (rozhodné období k nominaci). Při shodě vyhrává novější výsledek, proto stačí vyrovnat. Počítá s tím, že ostatní se nezlepší.</div>';
