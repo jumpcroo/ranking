@@ -245,6 +245,17 @@ header{position:sticky;top:0;z-index:30;background:var(--navy);color:#fff;box-sh
 .dFs{margin-top:10px;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:8px 14px}
 .dFsH{font-family:Poppins,sans-serif;font-weight:600;font-size:14px;padding:4px 0}.dFsH span{font-family:Inter,sans-serif;font-weight:400;color:var(--muted);font-size:12.5px}
 @media (max-width:560px){.dList,.dFs,.dTags{margin-left:0}.dRow{grid-template-columns:1fr auto}.dRow .n{grid-column:1/-1}}
+.dOv{margin:14px 0;padding:14px 16px;border-radius:14px;background:var(--navy-tint);border:1px solid var(--line)}
+.dOvTop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:6px}
+.dOv .t{font-family:Poppins,sans-serif;font-weight:700;font-size:17px;color:var(--navy)}
+.dOv .s{font-size:13.5px;color:var(--muted);margin-top:2px;line-height:1.45}
+.dOv .big{font-family:Poppins,sans-serif;font-size:30px;white-space:nowrap;color:var(--navy)}.dOv .big span{font-size:15px;color:var(--muted)}
+.dOv .dList{margin-left:0}.x2{font-size:11px;font-weight:700;background:var(--navy);color:#fff;border-radius:4px;padding:1px 5px;margin-left:4px}
+.dOvList{margin-top:10px;background:var(--surface);border-radius:10px;padding:4px 12px}
+.ovRow{display:flex;gap:10px;align-items:baseline;padding:7px 0;border-top:1px solid var(--line);font-size:14.5px}.ovRow:first-child{border-top:0}
+.ovRow .r{width:30px;font-weight:700}.ovRow .nm{flex:1}.ovRow .c{color:var(--muted);font-size:12.5px;margin-left:4px}.ovRow .tt{font-family:Poppins,sans-serif;font-weight:600}
+.ovRow.me{color:var(--navy);font-weight:700}.dOvList .gap{text-align:center;color:var(--muted);padding:2px 0}
+.dOvNote{font-size:12.5px;color:var(--muted);margin-top:8px;line-height:1.5}
 .dSum{margin-top:18px;border-top:2px solid var(--navy);padding-top:14px}
 .dSumH{font-family:Poppins,sans-serif;font-weight:700;font-size:19px;margin-bottom:10px}
 .dSumG{border-radius:12px;padding:12px 14px;margin-bottom:10px;font-size:15px;line-height:1.55}
@@ -1116,6 +1127,9 @@ function conclusions(S,clubs){
       const nm_=fsAll.reduce((t,a)=>t+(a.fs.am||0),0),nb_=fsAll.reduce((t,a)=>t+(a.fs.ab||0),0);
       out.push({i:'🎼',t:'Freestyle: '+clean+' z '+fsAll.length+' '+cz(fsAll.length,'sestavy','sestav','sestav')+' bez srážek a se všemi povinnými prvky. Celkem <b>'+fmt(nm_)+' '+cz(nm_,'chyba','chyby','chyb')+'</b> a <b>'+fmt(nb_)+' '+cz(nb_,'break','breaky','breaků')+'</b>; srážky a nesplněné prvky stály dohromady '+body(lost)+'.'});}
   }
+  {const pod=[...S.athMap.values()].map(a=>({a,ov:overallFor(a.aid,S.comp)})).filter(x=>x.ov&&x.ov.me.rk<=3)
+      .sort((x,y)=>x.ov.al-y.ov.al||x.ov.me.rk-y.ov.me.rk);
+    if(pod.length)out.push({i:'🏆',t:'Neoficiální overall (dopočtený, srovnání se závodníky se stejnými disciplínami): '+pod.map(x=>MED[x.ov.me.rk]+' <b>'+esc(x.a.name)+'</b> ('+catLabelLvl(x.ov.al)+', z '+x.ov.n+')').join(' · ')});}
   if(S.withHist.length){
     const up=S.withHist.filter(e=>e.delta>0).length;
     out.push({i:'📈',t:'<b>'+S.pbs.length+' '+cz(S.pbs.length,'osobní rekord','osobní rekordy','osobních rekordů')+'</b> z '+S.withHist.length+' startů, kde bylo s čím srovnávat ('+pct(S.pbs.length/S.withHist.length)+'). Proti minulému startu v disciplíně zlepšení u '+up+' z '+S.withHist.length+'.'});
@@ -1133,6 +1147,53 @@ function conclusions(S,clubs){
 }
 /* Detail závodníka v Závodech: přes celou obrazovku, větší písmo, údaje pod sebou,
    na konci slovní shrnutí. Srovnání vždy s historií PŘED tímto závodem. */
+/* Neoficiální overall podle IJRU: součet pořadí v individuálních disciplínách
+   (SR Individual Freestyle ×2), nejnižší součet vyhrává; při shodě rozhoduje
+   součet normalizovaných skóre N = 99·(R−Rmin)/(Rmax−Rmin)+1 (SRIF ×2).
+   Overall na závodech nebyl, proto se počítá pro každou závodnici zvlášť ze
+   SVÝCH disciplín: srovnává se jen s těmi, kdo ve stejné kategorii, pohlaví
+   a úrovni závodu jeli všechny tyto disciplíny, a pořadí v disciplínách se
+   přepočítá jen mezi nimi. Zahraniční závodníci v datech nejsou. */
+const OV_DISC=['SRSS','SRSE','SRTU','SRIF'];
+const ovMult=d=>d==='SRIF'?2:1;
+function rankBy(list,val){const s=[...list].sort((a,b)=>val(b)-val(a));const rk=new Map();
+  s.forEach((x,i)=>{rk.set(x,i>0&&val(s[i-1])===val(x)?rk.get(s[i-1]):i+1);});return rk;}
+function overallFor(aid,comp){
+  const mine=P.filter(r=>r.comp===comp&&r.kind==='ind'&&OV_DISC.includes(r.disc)&&r.members[0].aid===aid);
+  if(mine.length<2)return null;
+  const al=mine[0].al,gen=mine[0].gender,lc=mine[0].lc;
+  if(mine.some(r=>r.al!==al||r.gender!==gen||r.lc!==lc))return null;
+  const D=[...new Set(mine.map(r=>r.disc))].sort((a,b)=>discOrd(a)-discOrd(b));
+  const pool=P.filter(r=>r.comp===comp&&r.kind==='ind'&&D.includes(r.disc)&&r.al===al&&r.gender===gen&&r.lc===lc);
+  const by=new Map();pool.forEach(r=>{const k=r.members[0].aid;if(!by.has(k))by.set(k,{aid:k,name:r.members[0].name,club:r.club,p:{}});
+    const o=by.get(k);if(!o.p[r.disc]||r.score>o.p[r.disc].score)o.p[r.disc]=r;});
+  const anyStart=by.size;
+  const el=[...by.values()].filter(o=>D.every(d=>o.p[d]));
+  if(el.length<2)return null;
+  D.forEach(d=>{const rk=rankBy(el,o=>o.p[d].score);const sc=el.map(o=>o.p[d].score),mn=Math.min(...sc),mx=Math.max(...sc);
+    el.forEach(o=>{o['r_'+d]=rk.get(o);o['n_'+d]=mx>mn?99*(o.p[d].score-mn)/(mx-mn)+1:100;});});
+  el.forEach(o=>{o.T=D.reduce((t,d)=>t+o['r_'+d]*ovMult(d),0);o.B=D.reduce((t,d)=>t+o['n_'+d]*ovMult(d),0);});
+  el.sort((a,b)=>a.T-b.T||b.B-a.B);
+  el.forEach((o,i)=>{o.rk=i>0&&el[i-1].T===o.T&&Math.abs(el[i-1].B-o.B)<1e-9?el[i-1].rk:i+1;});
+  const me=el.find(o=>o.aid===aid);
+  return{me,el,D,n:el.length,anyStart,al,gen,lc};
+}
+function overallBlock(ov,a){
+  if(!ov)return '';const me=ov.me;
+  let h='<div class="dOv"><div class="dOvTop"><div><div class="t">Neoficiální overall</div>'+
+    '<div class="s">'+catLabelLvl(ov.al)+' · '+genLabel(ov.gen)+' · srovnání s '+(ov.n-1)+' '+cz(ov.n-1,'závodníkem','závodníky','závodníky')+', kteří jeli stejné disciplíny (v kategorii startovalo celkem '+ov.anyStart+')</div></div>'+
+    '<div class="big">'+(me.rk<=3?MED[me.rk]+' ':'')+'<b>'+me.rk+'.</b><span> z '+ov.n+'</span></div></div>';
+  h+='<div class="dList">';
+  ov.D.forEach(d=>{h+=dlRow(esc(dcName(d))+(ovMult(d)>1?' <span class="x2">×2</span>':''),'<b>'+me['r_'+d]+'.</b>','z '+ov.n+' · '+fmt(me.p[d].score));});
+  h+=dlRow('Součet pořadí','<b>'+fmt(me.T)+'</b>','nižší je lepší');
+  h+='</div><div class="dOvList">';
+  const show=ov.el.filter(o=>o.rk<=3||o.aid===me.aid||Math.abs(o.rk-me.rk)<=1);
+  let last=0;
+  show.forEach(o=>{if(o.rk>last+1&&last)h+='<div class="gap">…</div>';last=o.rk;
+    h+='<div class="ovRow'+(o.aid===me.aid?' me':'')+'"><span class="r">'+o.rk+'.</span><span class="nm">'+esc(o.name)+' <span class="c">'+esc(o.club||'')+'</span></span><span class="tt">'+fmt(o.T)+'</span></div>';});
+  h+='</div><div class="dOvNote">Overall na závodě nebyl, je dopočtený podle pravidel IJRU: součet pořadí, SR Individual Freestyle se počítá dvakrát, při shodě rozhodují normalizovaná skóre. Pořadí v disciplínách je přepočtené jen mezi závodníky v tomto srovnání; zahraniční závodníci v datech nejsou.</div></div>';
+  return h;
+}
 function priorOf(aid,disc,cd){return (histIdx().get(aid+'|'+disc)||[]).filter(x=>(x.date||'')<cd);}
 const avg=a=>a.length?a.reduce((s,x)=>s+x,0)/a.length:null;
 function dlRow(k,v,note,cls){return '<div class="dRow'+(cls?' '+cls:'')+'"><span class="k">'+k+'</span><span class="v">'+v+'</span>'+(note?'<span class="n">'+note+'</span>':'')+'</div>';}
@@ -1216,6 +1277,9 @@ function athDetail(a,S){
     (med?'<span class="hm">'+med+'</span>':'')+'</div>'+
     '<span class="psAct"><button class="psBtn" data-k="karta">Celá karta ›</button><button class="psBtn ghost" data-k="close" aria-label="Zavřít">✕</button></span></div><div class="dBody">';
   const acc={good:[],work:[],off:[]};
+  const ov=overallFor(a.aid,S.comp);
+  h+=overallBlock(ov,a);
+  if(ov&&ov.me.rk<=3)acc.good.push('<b>Overall</b>: '+ov.me.rk+'. místo z '+ov.n+' (neoficiálně)');
   a.items.forEach(ev=>{h+=startBlock(a,ev,S.cd,acc);});
   if(moves){
     const lc=nxtC===2?'junior':nxtC===3?'senior':null,H=histIdx();
