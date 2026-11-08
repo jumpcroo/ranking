@@ -268,6 +268,7 @@ header{position:sticky;top:0;z-index:30;background:var(--navy);color:#fff;box-sh
 .plGoal .k{font-weight:600}.plGoal .x{font-family:Poppins,sans-serif;font-weight:700;font-size:18px}.plGoal .n{font-size:13px;color:var(--muted)}
 .plGoal .hard{color:var(--bad);font-weight:600}.plGoal .ok{color:var(--ok);font-weight:600}
 @media (max-width:560px){.plGoal{grid-template-columns:1fr auto}.plGoal .n{grid-column:1/-1}}
+.plFar{font-size:12.5px;color:var(--muted);padding:2px 12px}
 .plTab{display:flex;flex-direction:column}
 .plTr{display:grid;grid-template-columns:1.2fr 1.3fr 1fr;gap:6px 12px;padding:10px 0;border-top:1px solid var(--line);font-size:14px;align-items:start}
 .plTr .plM{display:block}.plTr .dim{color:var(--muted)}
@@ -742,7 +743,7 @@ function planRows(a){
       if(ref.rk>4)tgt.push({k:3,lab:'na 3. místo'});
       if(ref.rk>2)tgt.push({k:1,lab:'na 1. místo'});
       tgt.forEach(t=>{const o=os[t.k-1];if(!o)return;const x=needToPass(self,o);if(x==null)return;
-        goals.push({k:'Ranking → '+t.k+'. místo',x:roundUp(x,sp),rank:true,who:o.kind==='ind'?o.ath:o.club});});
+        goals.push({k:'Ranking → '+t.k+'. místo',x:roundUp(x,sp),rank:true,who:o.kind==='ind'?o.ath:o.club,whoSum:o.sum});});
     }
     return{d,team,sp,self,best,bestRec,pb,gen,lvl,now,fut,lm,ls,atNext,goals,members:self&&team?self.members:null,
       sum:self?self.sum:0,cnt:self?self.tt.length:0};});
@@ -759,12 +760,17 @@ function renderPlan(host,a){
     nx.forEach(r=>{h+='<div class="plRow"><div class="plD"><b>'+esc(dcName(r.d))+'</b>'+(r.members?'<span class="plM">s '+r.members.filter(m=>m.aid!==a.aid).map(m=>esc(firstName(m.name))).join(', ')+'</span>':'')+
         '<span class="plB">nejlépe v období '+(r.best!=null?fmt(r.best):'—')+' · osobák '+fmt(r.pb)+'</span></div><div class="plG">';
       if(!r.goals.length)h+='<span class="plGoal ok">✔ limity splněné'+(r.now.rk===1?' a 1. v ČR':'')+' – drž formu</span>';
-      r.goals.forEach(g=>{const hard=g.x>r.pb;
+      /* reálný dosah na příští závod: ve speedu nejvýš osobák + 4 % (u SRSS ~3 skoky) */
+      const reach=Math.max(r.pb,r.best||0)*(r.sp?1.04:1.08);
+      const shown=r.goals.filter(g=>g.info||g.x<=reach),far=r.goals.filter(g=>!g.info&&g.x>reach);
+      if(!shown.length&&r.goals.length&&!r.goals.some(g=>g.info))h+='<span class="plGoal ok" style="background:var(--chip);color:var(--ink)">Posun v pořadí ani limit teď nejsou na dosah – cíl: zopakovat osobák a držet pozici ('+(r.now.rk)+'. v ČR).</span>';
+      shown.forEach(g=>{const hard=g.x>r.pb;
         h+='<div class="plGoal'+(g.rank?' rk':'')+'"><span class="k">'+g.k+'</span><span class="x">'+fmt(g.x)+'+</span><span class="n">'+
-          (g.info?g.info:g.rank?'předběhneš '+esc(g.who||''):(g.gap!=null?'chybí '+u(r,g.gap):'zatím bez výsledku'))+
-          (hard?' · <span class="hard">nad osobákem o '+u(r,g.x-r.pb)+'</span>':' · <span class="ok">stačí tvůj osobák</span>')+'</span></div>';});
+          (g.info?g.info:g.rank?'předběhneš '+esc(g.who||'')+' (součet '+fmt(g.whoSum)+')':(g.gap!=null?'chybí '+u(r,g.gap):'zatím bez výsledku'))+
+          (hard?' · <span class="hard">o '+u(r,g.x-r.pb)+' nad osobákem</span>':' · <span class="ok">stačí tvůj osobák</span>')+'</span></div>';});
+      if(far.length)h+='<div class="plFar">Dlouhodobě: '+far.map(g=>g.k.replace('Ranking → ','')+' '+fmt(g.x)+'+').join(' · ')+'</div>';
       h+='</div></div>';});
-    h+='<div class="anFoot">Ranking = součet dvou nejlepších áček od '+czDate(R.from)+' (rozhodné období k nominaci). Při shodě vyhrává novější výsledek, proto stačí vyrovnat. Počítá s tím, že ostatní se nezlepší.</div>';
+    h+='<div class="anFoot">Ranking = součet dvou nejlepších áček od '+czDate(R.from)+' (rozhodné období k nominaci). Při shodě vyhrává novější výsledek, proto stačí vyrovnat. Počítá s tím, že ostatní se nezlepší. Ukazují se jen cíle na dosah (ve speedu nejvýš o 4 % nad osobákem), vzdálenější jsou pod „Dlouhodobě“.</div>';
     c.innerHTML=h;host.appendChild(c);}
   /* Nominace */
   if(R.lc27&&showMs(a.aid,R.cat27)){const c=document.createElement('div');c.className='anCard plCard';
