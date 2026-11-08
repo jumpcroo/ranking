@@ -211,7 +211,9 @@ header{position:sticky;top:0;z-index:30;background:var(--navy);color:#fff;box-sh
 .psChip:hover{border-color:var(--navy)}.psChip.on{border-color:var(--navy);box-shadow:0 0 0 2px var(--navy) inset}
 .psChip .nm{font-weight:600;font-size:13.5px}.psChip .mx{font-size:13px;min-height:18px;display:flex;gap:6px;align-items:center}
 .pbn{font-size:10.5px;font-weight:700;color:var(--warn);background:var(--warn-bg);border-radius:5px;padding:1px 6px}
-#psDetail{margin:12px 0 0;scroll-margin-top:calc(var(--hh,56px) + 10px)}
+.psPanel{max-width:680px}.psPanel .modalBody{padding:0;gap:0}
+#psDetail{margin:0;border:0;box-shadow:none;border-radius:0}
+#psDetail>.h{top:0}
 .psRow .pm{font-size:18px;min-width:26px;font-family:Poppins,sans-serif;font-weight:700;color:var(--muted)}
 .psAct{margin-left:auto;display:flex;gap:6px}
 .psBtn{border:1px solid var(--navy);background:var(--navy);color:#fff;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:600;cursor:pointer}
@@ -1130,12 +1132,23 @@ function athDetail(a,S){
         :'<div class="s">Limity na MS se v nové kategorii nemění, čeká tě ale silnější konkurence.</div>')+'</div>';
   }
   c.innerHTML=h;
-  c.querySelector('[data-k="karta"]').onclick=()=>{state.selAid=a.aid;state.q='';document.getElementById('q').value='';setMode('karta');window.scrollTo(0,0);};
-  c.querySelector('[data-k="close"]').onclick=()=>{state.psSel=null;render();};
+  c.querySelector('[data-k="karta"]').onclick=()=>{state.psSel=null;psOpen(null);state.selAid=a.aid;state.q='';document.getElementById('q').value='';setMode('karta');window.scrollTo(0,0);};
+  c.querySelector('[data-k="close"]').onclick=()=>{state.psSel=null;psOpen(null);render();};
   return c;
 }
 function psSection(title,sub){const s=document.createElement('section');s.className='psSec';
   s.innerHTML='<div class="psSecH">'+title+'</div>'+(sub?'<div class="psSecS">'+sub+'</div>':'');return s;}
+function psOpen(el){
+  let m=document.getElementById('psModal');
+  if(!el){if(m){m.remove();document.body.style.overflow='';}return;}
+  if(!m){m=document.createElement('div');m.id='psModal';m.className='modal';
+    m.innerHTML='<div class="modalPanel psPanel" role="dialog" aria-label="Detail závodníka"><div class="modalBody"></div></div>';
+    m.onclick=e=>{if(e.target===m){state.psSel=null;psOpen(null);render();}};
+    document.body.appendChild(m);}
+  const b=m.querySelector('.modalBody');b.innerHTML='';b.appendChild(el);b.scrollTop=0;
+  document.body.style.overflow='hidden';
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElementById('psModal')){state.psSel=null;psOpen(null);render();}});
 function renderPosun(host){
   const clubs=posunClubs();
   const list=[...new Set(P.filter(r=>r.club&&clubs.has(r.club)).map(r=>r.comp))]
@@ -1201,23 +1214,22 @@ function renderPosun(host){
   const s=psSection('Závodníci','Klikni na jméno – ukáže se detail. Hledat můžeš i nahoře.');
   let ath=[...S.athMap.values()].sort((a,b)=>a.name.localeCompare(b.name,'cs'));
   if(state.q)ath=ath.filter(a=>a.name.toLowerCase().includes(state.q));
-  if(state.q&&ath.length===1)state.psSel=ath[0].aid;
+  if(state.q&&ath.length===1&&state._psQ!==state.q){state.psSel=ath[0].aid;}
+  state._psQ=state.q;
   const grid=document.createElement('div');grid.className='psGrid';
   ath.forEach(a=>{const b=document.createElement('button');b.className='psChip'+(state.psSel===a.aid?' on':'');
     const m=a.items.map(ev=>ev.r.pl).filter(p=>p>=1&&p<=3).sort().map(p=>MED[p]).join('');
     const pb=a.items.filter(ev=>ev.pb).length;
     b.innerHTML='<span class="nm">'+esc(a.name)+'</span><span class="mx">'+m+(pb?'<span class="pbn">'+pb+'× osobák</span>':'')+'</span>';
-    b.onclick=()=>{state.psSel=state.psSel===a.aid?null:a.aid;render();
-      const d=document.getElementById('psDetail');if(d)d.scrollIntoView({behavior:'smooth',block:'start'});};
+    b.onclick=()=>{state.psSel=a.aid;render();};
     grid.appendChild(b);});
   if(!ath.length)grid.innerHTML='<div class="khint">Nikdo s tímto jménem na závodě nestartoval.</div>';
   s.appendChild(grid);host.appendChild(s);
-  if(state.psSel&&S.athMap.has(state.psSel))s.appendChild(athDetail(S.athMap.get(state.psSel),S));
-  host.querySelectorAll('.psName').forEach(b=>b.onclick=()=>{state.psSel=b.dataset.aid;render();
-    const d=document.getElementById('psDetail');if(d)d.scrollIntoView({behavior:'smooth',block:'start'});});
+  psOpen(state.psSel&&S.athMap.has(state.psSel)?athDetail(S.athMap.get(state.psSel),S):null);
+  host.querySelectorAll('.psName').forEach(b=>b.onclick=()=>{state.psSel=b.dataset.aid;render();});
   document.getElementById('count').innerHTML='<b>'+esc(shortComp(S.comp))+'</b> · '+S.athMap.size+' '+cz(S.athMap.size,'závodník','závodníci','závodníků');
 }
-function setMode(m){state.mode=m;
+function setMode(m){if(m!=='posun'&&typeof psOpen==='function'){state.psSel=null;psOpen(null);}state.mode=m;
   document.getElementById('mRank').setAttribute('aria-pressed',m==='rank');
   document.getElementById('mLim').setAttribute('aria-pressed',m==='lim');
   document.getElementById('mKarta').setAttribute('aria-pressed',m==='karta');
