@@ -138,13 +138,35 @@ header{position:sticky;top:0;z-index:30;background:var(--navy);color:#fff;box-sh
 .ptlab{font:600 11px Inter,sans-serif;fill:var(--ink)}
 .xlab{font:500 10px Inter,sans-serif;fill:var(--muted)}
 :focus-visible{outline:2px solid var(--navy);outline-offset:2px}
+.psHead{margin:0 0 14px;padding:12px 14px;background:var(--navy);color:#fff;border-radius:12px}
+.psHead .t{font-family:Poppins,sans-serif;font-weight:700;font-size:16px;margin-bottom:2px}
+.psHead .s{font-size:12px;opacity:.85;line-height:1.5}
+.psWin{margin:0 0 14px;padding:10px 13px;background:var(--ok-bg);color:var(--ok);border-radius:10px;font-size:12.5px;line-height:1.6}
+.psWin b{font-weight:700}
+.psAth{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:12px;overflow:hidden}
+.psAth>.h{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;padding:12px 14px;border-bottom:1px solid var(--line);background:var(--surface-2)}
+.psAth>.h .nm{font-family:Poppins,sans-serif;font-weight:600;font-size:15px}
+.psAth>.h .meta{font-size:11.5px;color:var(--muted)}
+.psRow{display:flex;align-items:center;gap:10px;padding:10px 14px;border-top:1px solid var(--line);flex-wrap:wrap}
+.psRow:first-of-type{border-top:0}
+.psRow .d{font-size:12.5px;min-width:160px;flex:1 1 160px}
+.psRow .d b{font-family:Poppins,sans-serif;font-weight:600}
+.psRow .sc{font-family:Poppins,sans-serif;font-weight:700;font-size:16px;min-width:62px;text-align:right}
+.psDelta{font-size:12px;font-weight:600;padding:3px 8px;border-radius:999px;white-space:nowrap}
+.psUp{background:var(--ok-bg);color:var(--ok)}
+.psDown{background:var(--chip);color:var(--muted)}
+.psFirst{background:var(--navy-tint);color:var(--navy)}
+.psTag{font-size:10.5px;font-weight:700;letter-spacing:.02em;padding:3px 7px;border-radius:6px;white-space:nowrap}
+.psPB{background:var(--warn-bg);color:var(--warn)}
+.psLim{background:var(--ok-bg);color:var(--ok)}
+.psTeam{font-size:11px;color:var(--muted);flex-basis:100%}
 .winnote{margin:0 0 12px;padding:9px 12px;background:var(--navy-tint);color:var(--navy);border-radius:10px;font-size:12px;line-height:1.5;font-weight:500}
 .winnote b{font-weight:700}
 .profnote{margin:0 0 12px;padding:9px 12px;background:var(--surface-2);color:var(--muted);border:1px solid var(--line);border-radius:10px;font-size:11.5px;line-height:1.5}
 </style></head><body>
 
 <header><div class="hbar">
-  <div class="modeToggle" role="tablist"><button id="mRank" aria-pressed="true">Ranking</button><button id="mLim" aria-pressed="false">Limity</button><button id="mKarta" aria-pressed="false">Karta</button></div>
+  <div class="modeToggle" role="tablist"><button id="mRank" aria-pressed="true">Ranking</button><button id="mLim" aria-pressed="false">Limity</button><button id="mKarta" aria-pressed="false">Karta</button><button id="mPosun" aria-pressed="false">Posun</button></div>
 </div></header>
 
 <div class="wrap">
@@ -162,6 +184,10 @@ header{position:sticky;top:0;z-index:30;background:var(--navy);color:#fff;box-sh
     <div class="modeOpts" id="rankOpts">
       <span class="lbl">Ranking z</span>
       <div class="seg"><button data-rs="all" aria-pressed="true">Všechny soutěže</button><button data-rs="A" aria-pressed="false">Jen áčka (nominace)</button></div>
+    </div>
+    <div class="modeOpts" id="posunOpts" hidden>
+      <span class="lbl">Závod</span>
+      <div class="chips" id="psComp"></div>
     </div>
     <div class="modeOpts" id="limOpts" hidden>
       <span class="lbl">Kvalifikace na</span>
@@ -211,7 +237,8 @@ const esc=s=>(s+'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"'
 const shortComp=n=>n.replace('Mistrovství České republiky','MČR').replace(' Competition','').replace(' 2026','').replace('Between Speed Open','Between').replace('Czech Jump Rope Open','Czech Open');
 
 const state={mode:'rank',q:'',target:'ms',limShow:'all',rankScope:'all',selAid:null,
-  cat:new Set(),gen:new Set(),disc:new Set(),team:new Set(),comp:new Set()};
+  cat:new Set(),gen:new Set(),disc:new Set(),team:new Set(),comp:new Set(),
+  posunComp:null};
 const COMP_PREF=["Master Cup 2026","S-Bee Games 2026","Skippy Cup 2026","Mamut Cup 2026","Rebelstyle Competition 2026","Maky Cup 2026","Between Speed Open","Mistrovství České republiky 2026","Mini Cup 2026","ME","EOT","JME","Czech Jump Rope Open 2026"];
 const COMP_ORDER=COMP_PREF.concat([...new Set(P.map(r=>r.comp))].filter(c=>c&&!COMP_PREF.includes(c)).sort((a,b)=>a.localeCompare(b,"cs")));
 const GRP=DATA.compGroups||{A:[],mixed:[],B:[],intl:[]};
@@ -293,10 +320,14 @@ function render(){
   document.getElementById('legend').hidden=state.mode!=='rank';
   document.getElementById('rankOpts').hidden=state.mode!=='rank';
   document.getElementById('limOpts').hidden=state.mode!=='lim';
+  document.getElementById('posunOpts').hidden=state.mode!=='posun';
   const wn=document.getElementById('winNote');
-  if(wn){wn.hidden=state.mode==='karta';
+  if(wn){wn.hidden=state.mode==='karta'||state.mode==='posun';
     wn.innerHTML='Rozhodné období: <b>od '+czDate(WIN_FROM)+'</b> — 10 celých kalendářních měsíců zpět plus běžící měsíc. '
       +'Starší výsledky se do '+(state.mode==='rank'?'rankingu':'limitů')+' nepočítají; celou historii najdeš na Kartě.';}
+  if(state.mode==='posun'){tiles.innerHTML='';document.getElementById('count').innerHTML='';
+    const fc0=activeFilterCount();const bd0=document.getElementById('filtCount');bd0.hidden=!fc0;bd0.textContent=fc0;
+    renderPosun(host);return;}
   if(state.mode==='karta'){tiles.innerHTML='';document.getElementById('count').innerHTML='';const fc=activeFilterCount();const bd=document.getElementById('filtCount');bd.hidden=!fc;bd.textContent=fc;renderKarta(host);return;}
   const p=pool();
   const all=entities(p).filter(o=>o.lvl!=null);
@@ -486,10 +517,115 @@ function renderProfile(host,a){
     return out;})());
     host.appendChild(card);}
 }
-function setMode(m){state.mode=m;document.getElementById('mRank').setAttribute('aria-pressed',m==='rank');document.getElementById('mLim').setAttribute('aria-pressed',m==='lim');document.getElementById('mKarta').setAttribute('aria-pressed',m==='karta');render();}
+
+/* ---------- Záložka Posun ----------
+   Podklad na povídání o výsledcích po závodě. Bere jeden závod a u každé
+   závodnice ukáže, co zajela a o kolik se posunula proti svému poslednímu
+   výkonu v té disciplíně. Rozhodné období se tu neuplatňuje, porovnává se
+   s celou historií. U týmových disciplín se porovnává s vlastním předchozím
+   výkonem v disciplíně, i když mohla být sestava jiná. */
+const compDate=(()=>{const m={};P.forEach(r=>{const d=r.date||'';if(!m[r.comp]||d<m[r.comp])m[r.comp]=d;});return m;})();
+let _hist=null;
+function histIdx(){
+  if(_hist)return _hist;
+  const m=new Map();
+  P.forEach(r=>r.members.forEach(mm=>{const k=mm.aid+'|'+r.disc;if(!m.has(k))m.set(k,[]);m.get(k).push(r);}));
+  m.forEach(a=>a.sort((x,y)=>(x.date||'').localeCompare(y.date||'')));
+  _hist=m;return _hist;
+}
+const posunClubs=()=>state.team.size?state.team:new Set(['Jumpcroo']);
+function buildPosunChips(list){
+  const el=document.getElementById('psComp');if(!el)return;el.innerHTML='';
+  list.forEach(c=>{const b=document.createElement('button');
+    b.className='chip'+(c===state.posunComp?' on':'');
+    b.textContent=shortComp(c);
+    b.onclick=()=>{state.posunComp=c;render();};
+    el.appendChild(b);});
+}
+function renderPosun(host){
+  const clubs=posunClubs();
+  const list=[...new Set(P.filter(r=>r.club&&clubs.has(r.club)).map(r=>r.comp))]
+    .sort((a,b)=>(compDate[b]||'').localeCompare(compDate[a]||''));
+  if(!list.length){host.innerHTML='<div class="khint">Pro zvolený oddíl nejsou žádné výsledky.</div>';buildPosunChips([]);return;}
+  if(!state.posunComp||list.indexOf(state.posunComp)<0)state.posunComp=list[0];
+  buildPosunChips(list);
+  const comp=state.posunComp,cd=compDate[comp]||'',H=histIdx();
+  const byAth=new Map();
+  P.filter(r=>r.comp===comp&&r.club&&clubs.has(r.club)).forEach(r=>r.members.forEach(mm=>{
+    if(!byAth.has(mm.aid))byAth.set(mm.aid,{aid:mm.aid,name:mm.name,club:r.club,items:[]});
+    byAth.get(mm.aid).items.push(r);}));
+  if(state.q){for(const [k,a] of [...byAth]) if(!a.name.toLowerCase().includes(state.q)) byAth.delete(k);}
+  if(!byAth.size){host.innerHTML='<div class="khint">'+(state.q?'Nikdo s tímto jménem na závodě nestartoval.':'Na tomto závodě nikdo z oddílu nestartoval.')+'</div>';return;}
+
+  let nPB=0,nMcr=0,nMs=0,nStart=0;const wins=[];
+  byAth.forEach(a=>{
+    const cat=ATH[a.aid]===2?'junior':ATH[a.aid]===3?'senior':null;
+    a.items.forEach(r=>{
+      const h=(H.get(a.aid+'|'+r.disc)||[]).filter(x=>(x.date||'')<cd);
+      const prev=h.length?h[h.length-1]:null;
+      const bb=h.length?Math.max.apply(null,h.map(x=>x.score)):null;
+      r._prev=prev;r._delta=prev?r.score-prev.score:null;
+      r._pb=bb!==null&&r.score>bb;r._first=bb===null;
+      const lm=limitFor(r.disc,cat,'mcr'),ls=limitFor(r.disc,cat,'ms');
+      r._newMcr=lm!=null&&r.score>=lm&&(bb===null||bb<lm);
+      r._newMs=ls!=null&&r.score>=ls&&(bb===null||bb<ls);
+      nStart++;if(r._pb)nPB++;if(r._newMcr)nMcr++;if(r._newMs)nMs++;
+      if(r._delta>0)wins.push({n:a.name.split(' ')[0],d:r.disc,v:r._delta,s:r.score});
+    });
+    a.items.sort((x,y)=>((DISC_ORDER.indexOf(x.disc)+1||99)-(DISC_ORDER.indexOf(y.disc)+1||99)));
+  });
+
+  const hd=document.createElement('div');hd.className='psHead';
+  hd.innerHTML='<div class="t">'+esc(comp)+'</div><div class="s">'+czDate(cd)+' · '+byAth.size+
+    ' závodnic a závodníků · '+nStart+' startů</div>';
+  host.appendChild(hd);
+
+  wins.sort((x,y)=>y.v-x.v);
+  const bits=[];
+  if(nPB)bits.push('<b>'+nPB+'×</b> osobní rekord');
+  if(nMcr)bits.push('<b>'+nMcr+'×</b> poprvé nad limitem MČR');
+  if(nMs)bits.push('<b>'+nMs+'×</b> poprvé nad limitem MS');
+  if(bits.length||wins.length){
+    const w=document.createElement('div');w.className='psWin';
+    let t=bits.length?bits.join(' · '):'Žádný osobní rekord, ale to se stává — podívejte se na jednotlivé posuny.';
+    if(wins.length)t+='<br>Největší zlepšení: '+wins.slice(0,3).map(x=>esc(x.n)+' '+x.d+' o '+fmt(x.v)).join(' · ');
+    w.innerHTML=t;host.appendChild(w);
+  }
+
+  [...byAth.values()].sort((a,b)=>a.name.localeCompare(b.name,'cs')).forEach(a=>{
+    const c=document.createElement('div');c.className='psAth';
+    let h='<div class="h"><span class="nm">'+esc(a.name)+'</span><span class="meta">'+
+      catLabelLvl(ATH[a.aid]!=null?ATH[a.aid]:null)+'</span></div>';
+    a.items.forEach(r=>{
+      let tag='';
+      if(r._first)tag='<span class="psDelta psFirst">první start</span>';
+      else if(r._delta>0)tag='<span class="psDelta psUp">+'+fmt(r._delta)+'</span>';
+      else if(r._delta<0)tag='<span class="psDelta psDown">'+fmt(r._delta)+'</span>';
+      else tag='<span class="psDelta psDown">stejně</span>';
+      let tags='';
+      if(r._pb)tags+='<span class="psTag psPB">osobák</span>';
+      if(r._newMcr)tags+='<span class="psTag psLim">poprvé nad MČR</span>';
+      if(r._newMs)tags+='<span class="psTag psLim">limit MS</span>';
+      h+='<div class="psRow"><span class="d"><b>'+esc(dcName(r.disc))+'</b></span>'+
+        '<span class="sc">'+fmt(r.score)+'</span>'+tag+tags;
+      if(r._prev)h+='<span class="psTeam">minule '+fmt(r._prev.score)+' — '+esc(shortComp(r._prev.comp))+'</span>';
+      if(TEAM.has(r.disc))h+='<span class="psTeam">s '+r.members.filter(m=>m.aid!==a.aid).map(m=>esc(m.name.split(' ')[0])).join(', ')+'</span>';
+      h+='</div>';
+    });
+    c.innerHTML=h;host.appendChild(c);
+  });
+  document.getElementById('count').innerHTML='<b>'+byAth.size+'</b> závodnic a závodníků na závodě '+esc(shortComp(comp));
+}
+function setMode(m){state.mode=m;
+  document.getElementById('mRank').setAttribute('aria-pressed',m==='rank');
+  document.getElementById('mLim').setAttribute('aria-pressed',m==='lim');
+  document.getElementById('mKarta').setAttribute('aria-pressed',m==='karta');
+  document.getElementById('mPosun').setAttribute('aria-pressed',m==='posun');
+  render();}
 document.getElementById('mRank').onclick=()=>setMode('rank');
 document.getElementById('mLim').onclick=()=>setMode('lim');
 document.getElementById('mKarta').onclick=()=>setMode('karta');
+document.getElementById('mPosun').onclick=()=>setMode('posun');
 document.getElementById('q').addEventListener('input',e=>{state.q=e.target.value.trim().toLowerCase();if(state.mode==='karta')state.selAid=null;render();});
 const modal=document.getElementById('filterModal');
 function openModal(){modal.hidden=false;document.body.style.overflow='hidden';}
