@@ -146,7 +146,8 @@ def aid_for(part, pinfo):
 
 
 # ---------------------------------------------------------------- nové exporty
-files = sorted(f for f in glob.glob(os.path.join(DATA, "*.json")) if os.path.basename(f) != "legacy.json")
+NOT_RESULTS = {"legacy.json", "kategorie.json"}   # služební soubory, ne výsledkovky
+files = sorted(f for f in glob.glob(os.path.join(DATA, "*.json")) if os.path.basename(f) not in NOT_RESULTS)
 added = {}
 report = []
 
@@ -271,6 +272,18 @@ for aid, vals in mins.items():
         # kategorie by zamíchalo limity. Jen na to upozorníme.
         cat_warnings.append((aid, ath_cat[aid], lo))
 
+# Kategorie pro příští sezónu. V repu leží JEN dvojice aid → kategorie,
+# žádná jména a žádné ročníky narození – ty jsou osobní údaj a zůstávají mimo
+# repo (Jumpcroo/Spolek a administrativa/rocniky.csv). Kategorie sama z repa
+# nic nového neprozradí, je u každého startu ve výsledkovce.
+next_cat = {}
+next_season = None
+KATEGORIE = os.path.join(DATA, "kategorie.json")
+if os.path.exists(KATEGORIE):
+    k = load_json(KATEGORIE)
+    next_cat = k.get("cat") or {}
+    next_season = k.get("season")
+
 comp_groups = {"A": [], "mixed": [], "B": [], "intl": []}
 # pořadí soutěží podle data
 order = {}
@@ -291,6 +304,8 @@ payload = {
     "limits": limits,
     "compGroups": comp_groups,
     "athCat": ath_cat,
+    "athCatNext": next_cat,
+    "nextSeason": next_season,
     "perfs": perfs,
 }
 
@@ -324,6 +339,10 @@ if new_aids:
     for nm, aid in sorted(new_aids.items()):
         print("      %s → %s" % (nm, aid))
 print("  celkem: %d výkonů, %d soutěží, %d závodníků" % (len(perfs), len(order), len(ath_cat)))
+if next_cat:
+    print("  kategorie pro sezónu %s: %d závodníků" % (next_season, len(next_cat)))
+else:
+    print("  kategorie pro příští sezónu: data/kategorie.json není, blok o přechodu se nezobrazí")
 print("  rozhodné období se počítá v prohlížeči z aktuálního data, data generována %s" % generated)
 
 if CHECK:

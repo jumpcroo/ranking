@@ -83,6 +83,10 @@ je souhrn: kolik padlo osobáků, kolik limitů a tři největší zlepšení.
 Výchozí oddíl je Jumpcroo; jinak se řídí filtrem týmů. Hledání podle jména
 funguje, takže si každý najde sám sebe.
 
+U závodnic, které k 1. lednu přecházejí do vyšší věkové kategorie, přibude blok
+s limity na MS, které na ně v nové kategorii budou platit, a s jejich nejlepšími
+výkony. To je podklad na řeč o tom, co je čeká – hlavně u přechodu 9–11 → 12–15.
+
 Rozhodné období se tu **neuplatňuje** – porovnává se s celou historií.
 U týmových disciplín se porovnává s vlastním předchozím výkonem v disciplíně,
 i když mohla být sestava jiná.
@@ -116,6 +120,7 @@ https://www.czechjumprope.cz/soutezni-system/
 | `template.html` | stránka bez dat, se značkou `__DATA__` |
 | `config.json` | úrovně smíšených soutěží, sjednocení názvů oddílů |
 | `data/legacy.json` | zamrzlá ověřená data soutěží do Czech Open 2026 včetně |
+| `data/kategorie.json` | kategorie pro příští sezónu, jen dvojice ID → kategorie |
 | `data/*.json` | JSON exporty jednotlivých soutěží |
 | `index.html` | vygenerovaná stránka – tu publikuje GitHub Pages |
 
@@ -123,6 +128,21 @@ https://www.czechjumprope.cz/soutezni-system/
 a seznam týmových disciplín – **když svaz změní limity, mění se tam.**
 U historických soutěží jsou v něm A/B příznaky jednotlivých výsledků, které
 není z čeho odvodit (viz výš o smíšených soutěžích).
+
+## Osobní údaje
+
+**Repo je veřejné** – jinak by GitHub Pages zadarmo nefungovaly. Cokoli se sem
+commitne, si může kdokoli stáhnout. Proto sem **nepatří seznam členů**: jsou
+v něm data narození dětí, čísla pojišťoven a e-maily rodičů.
+
+`data/kategorie.json` proto obsahuje jen dvojice **členské ID → věková kategorie**.
+Žádná jména, žádné ročníky. Kategorie sama z repa nic nového neprozradí – je
+u každého startu ve výsledkovce.
+
+Ročníky narození, ze kterých se kategorie počítají, žijí mimo repo:
+`Jumpcroo/Spolek a administrativa/rocniky.csv` (jméno a rok, nic víc).
+Když se složení oddílu změní, přepočítá se z nich `data/kategorie.json` a do repa
+jde zase jen ten odvozený soubor.
 
 ## Kontrola
 
