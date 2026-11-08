@@ -887,7 +887,10 @@ function athDetail(a,S){
     h+='<div class="psNextBox"><div class="t">Od 1. 1. '+NEXT_SEASON+' závodíš v kategorii '+catLabelLvl(nxtC)+'</div>'+
       (lines.length?'<div class="s">Limity na MS v nové kategorii a tvé nejlepší výkony:</div>'+lines.join('')
         :'<div class="s">Limity na MS se v nové kategorii nemění, čeká tě ale silnější konkurence.</div>')+'</div>';}
-  const li=a=>a.map(x=>'<li>'+x+'</li>').join('');
+  /* body se stejnou disciplínou spojit do jedné odrážky */
+  const li=arr=>{const m=new Map();arr.forEach(x=>{const k=x.match(/^<b>(.*?)<\/b>: /);const d=k?k[1]:'';const t=k?x.slice(k[0].length):x;
+      if(!m.has(d))m.set(d,[]);m.get(d).push(t);});
+    return [...m].map(([d,t])=>'<li>'+(d?'<b>'+d+'</b>: ':'')+t.join('; ')+'</li>').join('');};
   h+='<div class="dSum"><div class="dSumH">Shrnutí</div>'+
     '<div class="dSumG good"><div class="t">💪 Co se povedlo</div>'+(acc.good.length?'<ul>'+li(acc.good)+'</ul>':'<p>Tentokrát bez osobního rekordu – výkony se držely kolem dosavadní úrovně.</p>')+'</div>'+
     '<div class="dSumG work"><div class="t">🎯 Na čem zamakat</div>'+(acc.work.length?'<ul>'+li(acc.work)+'</ul>':'<p>Žádná výrazná slabina z tohoto závodu.</p>')+'</div>'+
