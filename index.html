@@ -1176,8 +1176,8 @@ function startBlock(a,ev,cd,acc){
     h+=dlRow('Srážky','<b>'+(M>=1?'0 %':'−'+pct(1-M))+'</b>',cmpNote(1-M,A('M')==null?null:1-A('M'),false,x=>pct(x)),M<1?' warn':'');
     if(fa){const L=fa.loss,parts=[];
       const cnt=(n,a,b,c)=>fmt(n)+'× '+(Number.isInteger(n)?cz(n,a,b,c):b);
-      h+=dlRow('Počet chyb','<b>'+fmt(r.fs.am||0)+'</b>',(r.fs.am?cnt(r.fs.am,'chyba','chyby','chyb'):'bez chyb')+' · průměr rozhodčích');
-      if(r.fs.fm!=='dd'||r.fs.ab)h+=dlRow('Počet breaků','<b>'+fmt(r.fs.ab||0)+'</b>',r.fs.fm==='dd'?'v Double Dutch se za breaky nestrhává':'');
+      h+=dlRow('Započtené chyby','<b>'+(r.fs.am?cnt(r.fs.am,'chyba','chyby','chyb'):'žádná')+'</b>','',r.fs.am?' warn':' good');
+      if(r.fs.fm!=='dd'||r.fs.ab)h+=dlRow('Započtené breaky','<b>'+(r.fs.ab?cnt(r.fs.ab,'break','breaky','breaků'):'žádný')+'</b>',r.fs.fm==='dd'?'v Double Dutch se za breaky nestrhává':'',r.fs.ab?' warn':' good');
       if(r.fs.av)h+=dlRow('Porušení času / prostoru','<b>'+fmt(r.fs.av)+'</b>','');
       if(L.miss>0.005)parts.push('chyby −'+fmt(L.miss));if(L.brk>0.005)parts.push('breaky −'+fmt(L.brk));
       if(L.viol>0.005)parts.push('porušení −'+fmt(L.viol));if(L.req>0.005)parts.push('povinné prvky −'+fmt(L.req));
