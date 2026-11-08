@@ -206,7 +206,7 @@ def aid_for(part, pinfo):
 
 
 # ---------------------------------------------------------------- nové exporty
-NOT_RESULTS = {"legacy.json", "kategorie.json"}   # služební soubory, ne výsledkovky
+NOT_RESULTS = {"legacy.json", "kategorie.json", "reprezentace.json"}   # služební soubory, ne výsledkovky
 files = sorted(f for f in glob.glob(os.path.join(DATA, "*.json")) if os.path.basename(f) not in NOT_RESULTS)
 added = {}
 report = []
@@ -580,6 +580,7 @@ payload = {
     "compGroups": comp_groups,
     "athCat": ath_cat,
     "athCatNext": next_cat,
+    "repre": (load_json(os.path.join(DATA, "reprezentace.json")).get("aids") or []) if os.path.exists(os.path.join(DATA, "reprezentace.json")) else [],
     "nextSeason": next_season,
     "fields": fields,
     "clubs": clubs_tbl,

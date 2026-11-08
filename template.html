@@ -804,8 +804,9 @@ function conclusions(S,clubs){
     const up=S.withHist.filter(e=>e.delta>0).length;
     out.push({i:'📈',t:'<b>'+S.pbs.length+' '+cz(S.pbs.length,'osobní rekord','osobní rekordy','osobních rekordů')+'</b> z '+S.withHist.length+' startů, kde bylo s čím srovnávat ('+pct(S.pbs.length/S.withHist.length)+'). Proti minulému startu v disciplíně zlepšení u '+up+' z '+S.withHist.length+'.'});
   }
-  if(S.newMs.length)out.push({i:'✈️',t:'Nově nad limitem MS/ME: '+S.newMs.map(r=>'<b>'+who(r)+'</b> '+r.disc+' '+fmt(r.score)).join(' · ')});
-  if(S.newMcr.length)out.push({i:'⚠️',t:'Nově nad limitem MČR – v '+cz(S.newMcr.length,'této disciplíně','těchto disciplínách','těchto disciplínách')+' už nemohou startovat na B: '+S.newMcr.map(r=>who(r)+' '+r.disc).join(' · ')});
+  if(S.newMcr.length)out.push({i:'🎟️',t:'<b>Poprvé splněný limit MČR</b> ('+S.newMcr.length+'×): '+S.newMcr.map(r=>'<b>'+who(r)+'</b> '+r.disc+' '+fmt(r.score)).join(' · ')+'. V těchto disciplínách už nemohou startovat na B.'});
+  {const ms=S.newMs.filter(r=>r.members.some(m=>showMs(m.aid,r.al)));
+   if(ms.length)out.push({i:'✈️',t:'Nově nad limitem ME/MS: '+ms.map(r=>'<b>'+who(r)+'</b> '+r.disc+' '+fmt(r.score)).join(' · ')});}
   const sm=S.ours.filter(r=>r.sm);
   if(sm.length)out.push({i:'⏱️',t:'Chybný start nebo výměna '+sm.length+'×, stálo to '+skoky(sm.reduce((s,r)=>s+r.sm,0))+': '+sm.map(r=>who(r)+' '+r.disc).join(' · ')});
   if(S.hasField){
@@ -906,6 +907,9 @@ function overallAllBlock(aid,comp){
   h+='</div><div class="dOvNote">Body za každý start podle umístění v celém poli: vítěz 100, poslední 0, mezi tím rovnoměrně (např. 3. z 11 = 80). Týmová disciplína se započítá každému členovi týmu. Body se sčítají, takže víc disciplín znamená víc šancí – jako v overallu. Při shodě rozhoduje průměr na start. Pořadí podle průměru ukazuje kvalitu startů bez ohledu na jejich počet. Zahraniční závodníci v pořadí nejsou, ale v umístěních ano.</div></div>';
   return h;
 }
+const REPRE=new Set(DATA.repre||[]);
+/* limity ME/MS ukazovat jen u vybraných (data/reprezentace.json); když seznam není, u kategorií 12–15 a 16+ */
+const showMs=(aid,al)=>REPRE.size?REPRE.has(aid):(al===2||al===3);
 function priorOf(aid,disc,cd){return (histIdx().get(aid+'|'+disc)||[]).filter(x=>(x.date||'')<cd);}
 const avg=a=>a.length?a.reduce((s,x)=>s+x,0)/a.length:null;
 function dlRow(k,v,note,cls){return '<div class="dRow'+(cls?' '+cls:'')+'"><span class="k">'+k+'</span><span class="v">'+v+'</span>'+(note?'<span class="n">'+note+'</span>':'')+'</div>';}
@@ -925,8 +929,8 @@ function startBlock(a,ev,cd,acc){
   else if(ev.delta<0)h+='<span class="psDelta psDown">'+fmt(ev.delta)+' proti minule</span>';
   else h+='<span class="psDelta psDown">stejně jako minule</span>';
   if(ev.pb)h+='<span class="psTag psPB">osobní rekord</span>';
-  if(ev.newMs)h+='<span class="psTag psLim">limit MS/ME</span>';
-  if(ev.newMcr)h+='<span class="psTag psLim">poprvé nad MČR</span>';
+  if(ev.newMcr)h+='<span class="psTag psLim">poprvé limit MČR</span>';
+  if(ev.newMs&&showMs(a.aid,r.al))h+='<span class="psTag psLim">limit ME/MS</span>';
   h+='</div><div class="dList">';
   const g=r.fv!=null?gapInfo(r):null;
   if(g){h+=dlRow('Umístění','<b>'+r.pl+'.</b> z '+g.n);
@@ -935,6 +939,16 @@ function startBlock(a,ev,cd,acc){
   if(ev.prev)h+=dlRow('Minule',fmt(ev.prev.score),esc(shortComp(ev.prev.comp))+' <span class="psLvl">'+ev.prev.lc+'</span>');
   if(prior.length>=2)h+=dlRow('Dlouhodobý průměr',fmt(av),prior.length+' '+cz(prior.length,'start','starty','startů')+' · nejlépe '+fmt(best));
   if(r.sm)h+=dlRow('Chybný start / výměna','−'+skoky(r.sm),'',' bad');
+  /* limit MČR – primární; ME/MS jen u reprezentace */
+  const winBest=(histIdx().get(a.aid+'|'+r.disc)||[]).filter(x=>(x.date||'')>=WIN_FROM&&(x.date||'')<=cd).reduce((m,x)=>Math.max(m,x.score),-1);
+  if(ev.lm!=null){
+    let note,cls;
+    if(r.score>=ev.lm){note=ev.newMcr?'✔ splněno poprvé! V této disciplíně už ne na soutěže B.':'✔ splněno';cls=' good';}
+    else if(winBest>=ev.lm){note='tentokrát pod limitem, ale splněno dřív (nejlépe '+fmt(winBest)+' v rozhodném období)';cls=' good';}
+    else{note='chybí <b>'+u(ev.lm-r.score)+'</b>';cls=' warn';}
+    h+=dlRow('Limit MČR','<b>'+fmt(ev.lm)+'</b>',note,cls);}
+  if(ev.ls!=null&&showMs(a.aid,r.al))
+    h+=dlRow('Limit ME/MS',fmt(ev.ls),r.score>=ev.ls?'✔ splněno':'chybí '+u(ev.ls-r.score),r.score>=ev.ls?' good':'');
   h+='</div>';
   /* freestyle pod sebou */
   let fa=null;
@@ -963,7 +977,9 @@ function startBlock(a,ev,cd,acc){
   const rel=av?(r.score-av)/av:null;
   if(ev.pb)acc.good.push('<b>'+esc(nm)+'</b>: osobní rekord '+fmt(r.score)+(best!=null?' (dosud '+fmt(best)+')':''));
   else if(ev.delta>0&&rel!=null&&rel>0)acc.good.push('<b>'+esc(nm)+'</b>: +'+fmt(ev.delta)+' proti minule, nad dlouhodobým průměrem');
-  if(ev.newMs)acc.good.push('<b>'+esc(nm)+'</b>: nově splněný limit MS/ME');
+  if(ev.newMcr)acc.good.push('<b>'+esc(nm)+'</b>: poprvé splněný limit MČR');
+  if(ev.newMs&&showMs(a.aid,r.al))acc.good.push('<b>'+esc(nm)+'</b>: nově splněný limit ME/MS');
+  if(ev.lm!=null&&r.score<ev.lm&&winBest<ev.lm&&(ev.lm-r.score)/ev.lm<=0.06)acc.work.push('<b>'+esc(nm)+'</b>: do limitu MČR chybí jen '+u(ev.lm-r.score));
   if(r.fs&&fa&&prior.some(x=>x.fs)){const pf=prior.filter(x=>x.fs&&x.fs.D!=null).map(x=>x.fs);
     const aD=avg(pf.map(f=>f.D)),aP=avg(pf.map(f=>f.P));
     if(aD!=null&&r.fs.D>aD*1.05)acc.good.push('<b>'+esc(nm)+'</b>: vyšší obtížnost ('+fmt(r.fs.D)+' proti průměru '+fmt(aD)+')');
@@ -996,15 +1012,14 @@ function athDetail(a,S){
   if(ov&&ov.me.rk<=3)acc.good.push('<b>Overall individuálních disciplín</b>: '+ov.me.rk+'. místo z '+ov.n);
   a.items.forEach(ev=>{h+=startBlock(a,ev,S.cd,acc);});
   if(moves){
-    const lc=nxtC===2?'junior':nxtC===3?'senior':null,H=histIdx();
+    const lc=nxtC===2?'junior':nxtC===3?'senior':null,H=histIdx(),ms=REPRE.size?REPRE.has(a.aid):(nxtC===2||nxtC===3);
     const seen={},lines=[];
-    a.items.forEach(ev=>{const r=ev.r;if(seen[r.disc])return;seen[r.disc]=1;
+    if(ms&&lc)a.items.forEach(ev=>{const r=ev.r;if(seen[r.disc])return;seen[r.disc]=1;
       const lim=limitFor(r.disc,lc,'ms');if(lim==null)return;
       const mine=(H.get(a.aid+'|'+r.disc)||[]).reduce((m,x)=>Math.max(m,x.score),0);
       lines.push(dlRow(esc(dcName(r.disc)),'limit <b>'+fmt(lim)+'</b>',mine>=lim?'<span class="up">splněno, máš '+fmt(mine)+'</span>':'chybí '+fmt(lim-mine)));});
     h+='<div class="psNextBox"><div class="t">Od 1. 1. '+NEXT_SEASON+' závodíš v kategorii '+catLabelLvl(nxtC)+'</div>'+
-      (lines.length?'<div class="s">Limity na MS v nové kategorii a tvé nejlepší výkony:</div>'+lines.join('')
-        :'<div class="s">Limity na MS se v nové kategorii nemění, čeká tě ale silnější konkurence.</div>')+'</div>';}
+      '<div class="s">Limit MČR zůstává stejný, v nové kategorii tě ale čeká silnější konkurence.'+(lines.length?' Limity na ME/MS v nové kategorii a tvé nejlepší výkony:':'')+'</div>'+lines.join('')+'</div>';}
   /* body se stejnou disciplínou spojit do jedné odrážky */
   const li=arr=>{const m=new Map();arr.forEach(x=>{const k=x.match(/^<b>(.*?)<\/b>: /);const d=k?k[1]:'';const t=k?x.slice(k[0].length):x;
       if(!m.has(d))m.set(d,[]);m.get(d).push(t);});
@@ -1075,7 +1090,7 @@ function renderPosun(host){
   th+=tile(S.athMap.size,cz(S.athMap.size,'závodník','závodníci','závodníků'),'');
   th+=tile(S.pbs.length,cz(S.pbs.length,'osobní rekord','osobní rekordy','osobních rekordů'),'pb');
   th+=tile(S.clubRec.length,cz(S.clubRec.length,'rekord oddílu','rekordy oddílu','rekordů oddílu'),'cr');
-  th+=tile(S.newMs.length,'nově limit MS/ME','ok');
+  th+=tile(S.newMcr.length,'nově limit MČR','ok');
   tl.innerHTML=th;host.appendChild(tl);
   if(intl){const n=document.createElement('div');n.className='psNote';
     n.textContent='U mezinárodních závodů nemáme celou výsledkovou listinu, proto tu nejsou medaile ani srovnání s oddíly – jen posun proti vlastní historii.';host.appendChild(n);}
@@ -1107,8 +1122,8 @@ function renderPosun(host){
   if(S.clubRec.length||S.newMs.length||S.newMcr.length){const s=psSection('Rekordy a limity','Rekord oddílu = nejlepší výkon oddílu ve stejné disciplíně, kategorii a pohlaví, co máme data (od '+czDate(P.reduce((m,x)=>x.date&&x.date<m?x.date:m,'9999'))+').');
     let h='<div class="psRecs">';
     S.clubRec.forEach(r=>{h+='<div class="psRec"><span class="psTag psCR">rekord oddílu</span><b>'+esc(dcName(r.disc))+'</b> <span class="c">'+catLabelLvl(r.al)+' · '+genLabel(r.gender)+'</span> · '+who(r)+' <b>'+fmt(r.score)+'</b> <span class="c">(dosud '+fmt(r._clubPrev)+')</span></div>';});
-    S.newMs.forEach(r=>{h+='<div class="psRec"><span class="psTag psLim">limit MS/ME</span><b>'+esc(dcName(r.disc))+'</b> · '+who(r)+' <b>'+fmt(r.score)+'</b></div>';});
-    S.newMcr.forEach(r=>{h+='<div class="psRec"><span class="psTag psGap">limit MČR</span><b>'+esc(dcName(r.disc))+'</b> · '+who(r)+' <b>'+fmt(r.score)+'</b></div>';});
+    S.newMcr.forEach(r=>{h+='<div class="psRec"><span class="psTag psLim">limit MČR</span><b>'+esc(dcName(r.disc))+'</b> · '+who(r)+' <b>'+fmt(r.score)+'</b></div>';});
+    S.newMs.filter(r=>r.members.some(m=>showMs(m.aid,r.al))).forEach(r=>{h+='<div class="psRec"><span class="psTag psLim">limit ME/MS</span><b>'+esc(dcName(r.disc))+'</b> · '+who(r)+' <b>'+fmt(r.score)+'</b></div>';});
     s.insertAdjacentHTML('beforeend',h+'</div>');host.appendChild(s);}
 
   /* našeptávač jmen v hledání */
