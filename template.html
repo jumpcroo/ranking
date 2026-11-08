@@ -136,7 +136,9 @@ header{position:sticky;top:0;z-index:30;background:var(--navy);color:#fff;box-sh
 .chartcard .ct .dn{font-family:Poppins;font-weight:600;font-size:15px}
 .chartcard .ct .st{font-size:12px;color:var(--muted);margin-left:auto}
 .chartcard svg{width:100%;height:auto;display:block;overflow:visible}
-.chartcard svg.lc{max-width:540px;margin:0 auto 4px}
+.lcw{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:4px}
+.chartcard svg.lc{margin:0 auto}
+.halo{stroke:var(--surface);stroke-width:3px;paint-order:stroke;stroke-linejoin:round}
 .ptlab{font:600 11px Inter,sans-serif;fill:var(--ink)}
 .xlab{font:500 10px Inter,sans-serif;fill:var(--muted)}
 :focus-visible{outline:2px solid var(--navy);outline-offset:2px}
@@ -521,7 +523,7 @@ function athPerfs(aid,compSet){
 }
 function lineChart(series,lims){
   const LN=(lims||[]).filter(l=>l&&l.v!=null);
-  const W=320,H=160,pl=10,pr=10,pt=22,pb=38,n=series.length;
+  const n=series.length,W=Math.max(320,n*84),H=160,pl=42,pr=42,pt=22,pb=38;
   const xs=n===1?[W/2]:series.map((_,i)=>pl+i*((W-pl-pr)/(n-1)));
   const vals=series.map(s=>s.score);let mn=Math.min(...vals),mx=Math.max(...vals);
   LN.forEach(l=>{mn=Math.min(mn,l.v);mx=Math.max(mx,l.v);});
@@ -532,7 +534,7 @@ function lineChart(series,lims){
   LN.forEach(l=>{const ly=y(l.v);
     g+=`<line x1="0" y1="${ly.toFixed(1)}" x2="${W}" y2="${ly.toFixed(1)}" stroke="${l.color}" stroke-width="1.5" stroke-dasharray="5 4" opacity=".85"/>`;
     const ax=l.anchor==='start'?2:W-2;
-    g+=`<text class="ptlab" x="${ax}" y="${(ly-5).toFixed(1)}" text-anchor="${l.anchor}" fill="${l.color}">${l.label} ${fmt(l.v)}</text>`;});
+    g+=`<text class="ptlab halo" x="${ax}" y="${(ly-5).toFixed(1)}" text-anchor="${l.anchor}" fill="${l.color}">${l.label} ${fmt(l.v)}</text>`;});
   const firstIn=series.findIndex(s=>s.date&&s.date>=WIN_FROM);
   if(firstIn>0){const bx=(xs[firstIn-1]+xs[firstIn])/2;
     g+=`<line x1="${bx.toFixed(1)}" y1="${pt-8}" x2="${bx.toFixed(1)}" y2="${H-pb+4}" stroke="var(--line)" stroke-width="1" stroke-dasharray="3 3"/>`;}
@@ -540,10 +542,10 @@ function lineChart(series,lims){
   series.forEach((s,i)=>{const px=pts[i][0],py=pts[i][1];
     const inWin=!s.date||s.date>=WIN_FROM;
     g+=`<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="4" fill="${s.lc==='B'?'var(--surface)':'var(--navy)'}" stroke="var(--navy)" stroke-width="2"${inWin?'':' opacity=".4"'}/>`;
-    g+=`<text class="ptlab" x="${px.toFixed(1)}" y="${(py-8).toFixed(1)}" text-anchor="middle">${fmt(s.score)}</text>`;
+    g+=`<text class="ptlab halo" x="${px.toFixed(1)}" y="${(py-8).toFixed(1)}" text-anchor="middle">${fmt(s.score)}</text>`;
     g+=`<text class="xlab" x="${px.toFixed(1)}" y="${H-15}" text-anchor="middle">${esc(shortComp(s.comp))}</text>`;
     g+=`<text class="xlab" x="${px.toFixed(1)}" y="${H-4}" text-anchor="middle" opacity=".75">${s.lc} · ${shortDate(s.date)}</text>`;});
-  return `<svg class="lc" viewBox="0 0 ${W} ${H}" role="img" preserveAspectRatio="xMidYMid meet">${g}</svg>`;
+  return `<div class="lcw"><svg class="lc" viewBox="0 0 ${W} ${H}" role="img" preserveAspectRatio="xMidYMid meet" style="min-width:${W}px;max-width:${Math.round(W*1.6)}px">${g}</svg></div>`;
 }
 function renderKarta(host){
   host.innerHTML='';
