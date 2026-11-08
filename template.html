@@ -590,6 +590,7 @@ function renderProfile(host,a){
     if(lc)out.push({v:limitFor(d,lc,'ms'),label:'MS',color:'var(--ok)',anchor:'end'});
     return out;})())+lastStarts(a.aid,d).map(p=>startDetail(p,a)).join('');
     host.appendChild(card);}
+  requestAnimationFrame(()=>host.querySelectorAll('.lcw').forEach(w=>{w.scrollLeft=w.scrollWidth;}));
 }
 
 /* ---------- Záložka Posun ----------
