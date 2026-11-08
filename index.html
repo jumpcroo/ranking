@@ -1032,7 +1032,10 @@ function compSummary(comp,clubs){
   /* rekordy oddílu: lepší než cokoli, co oddíl zajel dřív ve stejné disciplíně, kategorii a pohlaví */
   const clubRec=ours.filter(r=>{
     const prior=P.filter(x=>x.club&&clubs.has(x.club)&&x.disc===r.disc&&x.al===r.al&&x.gender===r.gender&&(x.date||'')<cd);
-    if(!prior.length)return false;r._clubPrev=Math.max.apply(null,prior.map(x=>x.score));return r.score>r._clubPrev;});
+    if(!prior.length)return false;r._clubPrev=Math.max.apply(null,prior.map(x=>x.score));
+    /* v jedné skupině je rekordem jen nejlepší výkon závodu */
+    const bestHere=Math.max.apply(null,ours.filter(x=>x.disc===r.disc&&x.al===r.al&&x.gender===r.gender).map(x=>x.score));
+    return r.score>r._clubPrev&&r.score===bestHere;});
   const withHist=evals.filter(e=>!e.first);
   return{comp,cd,ours,hasField,rows,athMap,evals,medals,med,clubRec,withHist,
     pbs:evals.filter(e=>e.pb),firsts:evals.filter(e=>e.first),
