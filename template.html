@@ -176,6 +176,46 @@ header{position:sticky;top:0;z-index:30;background:var(--navy);color:#fff;box-sh
 .psLim{background:var(--ok-bg);color:var(--ok)}
 .psTeam{font-size:11px;color:var(--muted);flex-basis:100%}
 .psLvl{display:inline-block;font-weight:700;font-size:9.5px;padding:1px 5px;border-radius:4px;background:var(--chip);color:var(--chip-on);vertical-align:1px}
+.psTiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:0 0 14px}
+.psTile{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow)}
+.psTile .n{font-family:Poppins,sans-serif;font-weight:700;font-size:26px;line-height:1.1;color:var(--navy)}
+.psTile .t{font-size:12px;color:var(--muted);margin-top:2px}
+.psTile.med{grid-column:span 2}.psTile.med .mm{display:flex;gap:14px;margin-top:8px;font-family:Poppins,sans-serif;font-weight:600;font-size:15px}
+.psTile.pb .n{color:var(--warn)}.psTile.ok .n{color:var(--ok)}.psTile.cr .n{color:var(--bad)}
+@media (max-width:420px){.psTile.med{grid-column:1/-1}}
+.psNote{margin:0 0 14px;padding:10px 13px;background:var(--chip);color:var(--muted);border-radius:10px;font-size:12.5px;line-height:1.5}
+.psSec{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;margin:0 0 14px}
+.psSecH{font-family:Poppins,sans-serif;font-weight:700;font-size:16px}
+.psSecS{font-size:12px;color:var(--muted);margin:3px 0 10px;line-height:1.5}
+.psConc{list-style:none;margin:10px 0 0;padding:0}
+.psConc li{display:flex;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:13.5px;line-height:1.55}
+.psConc li:first-child{border-top:0}.psConc .i{flex:0 0 22px;text-align:center}
+.psMedList{display:flex;flex-direction:column}
+.psMed{display:grid;grid-template-columns:28px 1fr auto;grid-template-areas:"m d sc" "m w w";gap:2px 10px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}
+.psMed:first-child{border-top:0}
+.psMed .m{grid-area:m;font-size:20px}.psMed .d{grid-area:d;font-size:13px}.psMed .d b{font-family:Poppins,sans-serif;font-weight:600}
+.psMed .c,.psRec .c{color:var(--muted);font-size:11.5px;margin-left:6px}
+.psMed .w{grid-area:w;display:flex;flex-wrap:wrap;gap:4px}.psMed .sc{grid-area:sc;font-family:Poppins,sans-serif;font-weight:700}
+.psName{border:0;background:var(--navy-tint);color:var(--navy);border-radius:6px;padding:2px 7px;font-size:12px;cursor:pointer}
+.psName:hover{background:var(--navy);color:#fff}
+.psTab{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px}
+.psTab th{font-size:11px;color:var(--muted);font-weight:600;text-align:right;padding:4px 6px}
+.psTab td{padding:7px 6px;border-top:1px solid var(--line);text-align:right}
+.psTab td:nth-child(2),.psTab th:nth-child(2){text-align:left}.psTab td:first-child{color:var(--muted);width:28px}
+.psTab tr.me td{background:var(--navy-tint);font-weight:700;color:var(--navy)}
+@media (max-width:480px){.psTab .hs{display:none}}
+.psRecs{display:flex;flex-direction:column;gap:6px;margin-top:6px}.psRec{font-size:13px;line-height:1.6}
+.psRec .psTag{margin-right:8px}.psCR{background:var(--bad-bg);color:var(--bad)}
+.psGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-top:8px}
+.psChip{display:flex;flex-direction:column;align-items:flex-start;gap:3px;text-align:left;border:1px solid var(--line);background:var(--surface-2);border-radius:10px;padding:9px 11px;cursor:pointer;color:var(--ink)}
+.psChip:hover{border-color:var(--navy)}.psChip.on{border-color:var(--navy);box-shadow:0 0 0 2px var(--navy) inset}
+.psChip .nm{font-weight:600;font-size:13.5px}.psChip .mx{font-size:13px;min-height:18px;display:flex;gap:6px;align-items:center}
+.pbn{font-size:10.5px;font-weight:700;color:var(--warn);background:var(--warn-bg);border-radius:5px;padding:1px 6px}
+#psDetail{margin:12px 0 0;scroll-margin-top:calc(var(--hh,56px) + 10px)}
+.psRow .pm{font-size:18px;min-width:26px;font-family:Poppins,sans-serif;font-weight:700;color:var(--muted)}
+.psAct{margin-left:auto;display:flex;gap:6px}
+.psBtn{border:1px solid var(--navy);background:var(--navy);color:#fff;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:600;cursor:pointer}
+.psBtn.ghost{background:transparent;color:var(--navy)}
 
 .anCard{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 14px 10px;margin-top:12px}
 .anH{font-family:Poppins,sans-serif;font-weight:700;font-size:16px;color:var(--ink)}
@@ -593,12 +633,11 @@ function renderProfile(host,a){
   requestAnimationFrame(()=>host.querySelectorAll('.lcw').forEach(w=>{w.scrollLeft=w.scrollWidth;}));
 }
 
-/* ---------- Záložka Posun ----------
-   Podklad na povídání o výsledcích po závodě. Bere jeden závod a u každé
-   závodnice ukáže, co zajela a o kolik se posunula proti svému poslednímu
-   výkonu v té disciplíně. Rozhodné období se tu neuplatňuje, porovnává se
-   s celou historií. U týmových disciplín se porovnává s vlastním předchozím
-   výkonem v disciplíně, i když mohla být sestava jiná. */
+/* ---------- Záložka Závody ----------
+   Shrnutí jednoho závodu pro celý oddíl: medaile, srovnání s ostatními oddíly
+   (z kompletní výsledkovky), rekordy, limity a automatické závěry. Detail
+   jednotlivce se otevírá kliknutím na jméno. Rozhodné období se tu neuplatňuje,
+   porovnává se s celou historií před datem závodu. */
 const NEXTCAT=DATA.athCatNext||{},NEXT_SEASON=DATA.nextSeason||null;
 const compDate=(()=>{const m={};P.forEach(r=>{const d=r.date||'';if(!m[r.comp]||d<m[r.comp])m[r.comp]=d;});return m;})();
 let _hist=null;
@@ -610,14 +649,157 @@ function histIdx(){
   _hist=m;return _hist;
 }
 const posunClubs=()=>state.team.size?state.team:new Set(['Jumpcroo']);
+const MED=['','🥇','🥈','🥉'];
+function cz(n,a,b,c){return n===1?a:(n>=2&&n<=4?b:c);}
+const firstName=n=>(n||'').split(' ')[0];
+const discOrd=d=>(DISC_ORDER.indexOf(d)+1)||99;
 function buildPosunChips(list){
   const el=document.getElementById('psComp');if(!el)return;el.innerHTML='';
   list.forEach(c=>{const b=document.createElement('button');
     b.className='chip'+(c===state.posunComp?' on':'');
     b.textContent=shortComp(c);
-    b.onclick=()=>{state.posunComp=c;render();};
+    b.onclick=()=>{state.posunComp=c;state.psSel=null;render();};
     el.appendChild(b);});
 }
+/* Jeden start jedné závodnice: posun proti historii před závodem. */
+function evalStart(aid,r,cd){
+  const h=(histIdx().get(aid+'|'+r.disc)||[]).filter(x=>(x.date||'')<cd);
+  const prev=h.length?h[h.length-1]:null;
+  const bb=h.length?Math.max.apply(null,h.map(x=>x.score)):null;
+  const lc=r.al===2?'junior':r.al===3?'senior':null;
+  const lm=limitFor(r.disc,lc,'mcr'),ls=limitFor(r.disc,lc,'ms');
+  return{r,prev,delta:prev?r.score-prev.score:null,pb:bb!==null&&r.score>bb,first:bb===null,
+    newMcr:lm!=null&&r.score>=lm&&(bb===null||bb<lm),newMs:ls!=null&&r.score>=ls&&(bb===null||bb<ls),lm,ls};
+}
+function compSummary(comp,clubs){
+  const cd=compDate[comp]||'';
+  const ours=P.filter(r=>r.comp===comp&&r.club&&clubs.has(r.club))
+    .sort((a,b)=>discOrd(a.disc)-discOrd(b.disc)||(a.al-b.al));
+  const fieldIdx=new Set();FIELDS.forEach((f,i)=>{if(f[0]===comp)fieldIdx.add(i);});
+  const hasField=fieldIdx.size>0;
+  /* Medailová tabulka českých oddílů. Bere se z výkonů s oficiálním umístěním
+     (pl) – každý start právě jednou, i když byl vyhodnocen ve sloučené kategorii.
+     Zahraniční oddíly v datech nejsou, jejich starty jsou jen v polích
+     výsledkovky a umístění českých závodníků už zohledňují. */
+  const tab=new Map();
+  if(hasField)P.forEach(r=>{if(r.comp!==comp||!r.club)return;
+    const c=r.club;if(!tab.has(c))tab.set(c,{club:c,g:0,s:0,b:0,n:0});
+    const t=tab.get(c);t.n++;if(r.pl===1)t.g++;else if(r.pl===2)t.s++;else if(r.pl===3)t.b++;});
+  const rows=[...tab.values()].map(t=>(t.m=t.g+t.s+t.b,t))
+    .sort((a,b)=>b.g-a.g||b.s-a.s||b.b-a.b||b.m-a.m||a.club.localeCompare(b.club,'cs'));
+  const better=(a,b)=>a.g>b.g||(a.g===b.g&&(a.s>b.s||(a.s===b.s&&a.b>b.b)));
+  rows.forEach(t=>{t.rk=1+rows.filter(o=>better(o,t)).length;t.rkM=1+rows.filter(o=>o.m>t.m).length;});
+  /* naše starty */
+  const athMap=new Map();const evals=[];
+  ours.forEach(r=>r.members.forEach(mm=>{
+    if(!athMap.has(mm.aid))athMap.set(mm.aid,{aid:mm.aid,name:mm.name,club:r.club,items:[]});
+    const ev=evalStart(mm.aid,r,cd);athMap.get(mm.aid).items.push(ev);evals.push(Object.assign({aid:mm.aid,name:mm.name},ev));}));
+  const medals=ours.filter(r=>r.pl>=1&&r.pl<=3).sort((a,b)=>a.pl-b.pl||discOrd(a.disc)-discOrd(b.disc)||a.al-b.al);
+  const med={g:0,s:0,b:0};medals.forEach(r=>{med[['','g','s','b'][r.pl]]++;});
+  /* rekordy oddílu: lepší než cokoli, co oddíl zajel dřív ve stejné disciplíně, kategorii a pohlaví */
+  const clubRec=ours.filter(r=>{
+    const prior=P.filter(x=>x.club&&clubs.has(x.club)&&x.disc===r.disc&&x.al===r.al&&x.gender===r.gender&&(x.date||'')<cd);
+    if(!prior.length)return false;r._clubPrev=Math.max.apply(null,prior.map(x=>x.score));return r.score>r._clubPrev;});
+  const withHist=evals.filter(e=>!e.first);
+  return{comp,cd,ours,hasField,rows,athMap,evals,medals,med,clubRec,withHist,
+    pbs:evals.filter(e=>e.pb),firsts:evals.filter(e=>e.first),
+    newMs:ours.filter(r=>evals.some(e=>e.r===r&&e.newMs)),newMcr:ours.filter(r=>evals.some(e=>e.r===r&&e.newMcr))};
+}
+function who(r){return r.members.map(m=>esc(TEAM.has(r.disc)?firstName(m.name):m.name)).join(' + ');}
+function conclusions(S,clubs){
+  const out=[],ourName=[...clubs].join(' + ');
+  const mine=S.rows.filter(t=>clubs.has(t.club));
+  if(S.hasField&&mine.length){
+    const t=mine.length===1?mine[0]:null;
+    const tot=S.med.g+S.med.s+S.med.b;
+    if(t)out.push({i:'🏅',t:'V medailovém pořadí oddílů <b>'+t.rk+'. místo</b> z '+S.rows.length+' (podle zlatých), v celkovém počtu medailí <b>'+t.rkM+'.</b>'+
+      (t.rk===1?' Nejúspěšnější oddíl závodu.':'')});
+    const our=mine.reduce((a,t)=>({m:a.m+t.m,n:a.n+t.n}),{m:0,n:0});
+    const oth=S.rows.filter(t=>!clubs.has(t.club)).reduce((a,t)=>({m:a.m+t.m,n:a.n+t.n}),{m:0,n:0});
+    if(our.n)out.push({i:'🎯',t:'Medaile z <b>'+pct(our.m/our.n)+'</b> startů ('+our.m+' z '+our.n+')'+
+      (oth.n?', ostatní oddíly dohromady '+pct(oth.m/oth.n)+'.':'.')});
+    const byD={};S.medals.forEach(r=>{(byD[r.disc]=byD[r.disc]||{g:0,m:0}).m++;if(r.pl===1)byD[r.disc].g++;});
+    const top=Object.entries(byD).sort((a,b)=>b[1].g-a[1].g||b[1].m-a[1].m).slice(0,3);
+    if(top.length)out.push({i:'💪',t:'Nejsilnější: '+top.map(([d,v])=>'<b>'+esc(dcName(d))+'</b> ('+v.m+' '+cz(v.m,'medaile','medaile','medailí')+(v.g?', z toho '+v.g+'× zlato':'')+')').join(', ')+'.'});
+    const small=S.medals.filter(r=>{const f=fieldOf(r);return f&&f.e.length<=3;}).length;
+    if(small&&tot)out.push({i:'ℹ️',t:small+' z '+tot+' '+cz(tot,'medaile','medailí','medailí')+' v kategoriích, kde startovali nejvýš 3 – tam se bedna počítá, ale o síle tolik neříká.'});
+    /* těsně pod bednou */
+    const near=S.ours.filter(r=>r.pl>3).map(r=>{const g=gapInfo(r);if(!g)return null;
+      const t=g.targets.filter(x=>x.k<=3).sort((a,b)=>b.k-a.k)[0];if(!t)return null;
+      return{r,gap:t.gap,rel:t.score?t.gap/t.score:1};}).filter(x=>x&&x.gap>0).sort((a,b)=>a.rel-b.rel);
+    const n4=S.ours.filter(r=>r.pl===4).length;
+    if(near.length)out.push({i:'📏',t:(n4?'<b>'+n4+'× 4. místo.</b> ':'')+'Nejblíž bedně: '+near.slice(0,3).map(x=>who(x.r)+' '+x.r.disc+' ('+x.r.pl+'., chybělo '+(isSpeed(x.r.disc)?skoky(x.gap):body(x.gap))+')').join(' · ')});
+    /* freestyle bez chyb */
+    const fsLost=S.ours.filter(r=>r.fs&&r.pl>3).map(r=>({r,a:fsAnalysis(r)})).filter(x=>x.a&&x.a.cleanPlace!=null&&x.a.cleanPlace<=3);
+    if(fsLost.length)out.push({i:'🧹',t:'Ve freestylu by bez chyb (odhad) '+cz(fsLost.length,'byla','byly','bylo')+' na bedně ještě <b>'+fsLost.length+'</b> '+cz(fsLost.length,'sestava','sestavy','sestav')+': '+fsLost.map(x=>who(x.r)+' '+x.r.disc+' ('+x.r.pl+'. → '+x.a.cleanPlace+'.)').join(' · ')});
+    const fsAll=S.ours.filter(r=>r.fs).map(r=>fsAnalysis(r)).filter(Boolean);
+    if(fsAll.length){const lost=fsAll.reduce((s,a)=>s+a.loss.miss+a.loss.brk+a.loss.viol+a.loss.req,0);
+      const clean=fsAll.filter(a=>a.M>=1&&a.Q>=1).length;
+      out.push({i:'🎼',t:'Freestyle: '+clean+' z '+fsAll.length+' '+cz(fsAll.length,'sestavy','sestav','sestav')+' bez srážek a se všemi povinnými prvky. Srážky a nesplněné prvky stály dohromady '+body(lost)+'.'});}
+  }
+  if(S.withHist.length){
+    const up=S.withHist.filter(e=>e.delta>0).length;
+    out.push({i:'📈',t:'<b>'+S.pbs.length+' '+cz(S.pbs.length,'osobní rekord','osobní rekordy','osobních rekordů')+'</b> z '+S.withHist.length+' startů, kde bylo s čím srovnávat ('+pct(S.pbs.length/S.withHist.length)+'). Proti minulému startu v disciplíně zlepšení u '+up+' z '+S.withHist.length+'.'});
+  }
+  if(S.newMs.length)out.push({i:'✈️',t:'Nově nad limitem MS/ME: '+S.newMs.map(r=>'<b>'+who(r)+'</b> '+r.disc+' '+fmt(r.score)).join(' · ')});
+  if(S.newMcr.length)out.push({i:'⚠️',t:'Nově nad limitem MČR – v '+cz(S.newMcr.length,'této disciplíně','těchto disciplínách','těchto disciplínách')+' už nemohou startovat na B: '+S.newMcr.map(r=>who(r)+' '+r.disc).join(' · ')});
+  const sm=S.ours.filter(r=>r.sm);
+  if(sm.length)out.push({i:'⏱️',t:'Chybný start nebo výměna '+sm.length+'×, stálo to '+skoky(sm.reduce((s,r)=>s+r.sm,0))+': '+sm.map(r=>who(r)+' '+r.disc).join(' · ')});
+  if(S.hasField){
+    const byD={};S.ours.forEach(r=>{(byD[r.disc]=byD[r.disc]||[]).push(r);});
+    const weak=Object.entries(byD).filter(([d,a])=>a.length>=2&&!a.some(r=>r.pl<=3)).map(([d,a])=>({d,n:a.length,best:Math.min(...a.map(r=>r.pl||99))}));
+    if(weak.length)out.push({i:'🔧',t:'Bez medaile: '+weak.map(w=>'<b>'+esc(dcName(w.d))+'</b> ('+w.n+' '+cz(w.n,'start','starty','startů')+', nejlépe '+w.best+'.)').join(', ')+'.'});
+  }
+  return out;
+}
+function athDetail(a,S){
+  const c=document.createElement('div');c.className='psAth';c.id='psDetail';
+  const curC=ATH[a.aid],nxtC=NEXTCAT[a.aid];
+  const moves=NEXT_SEASON&&nxtC!=null&&curC!=null&&nxtC!==curC;
+  let h='<div class="h"><span class="nm">'+esc(a.name)+'</span><span class="meta">'+catLabelLvl(curC!=null?curC:null)+'</span>'+
+    (moves?'<span class="psTag psNext">od ledna '+catLabelLvl(nxtC)+'</span>':'')+
+    '<span class="psAct"><button class="psBtn" data-k="karta">Karta ›</button><button class="psBtn ghost" data-k="close" aria-label="Zavřít">✕</button></span></div>';
+  a.items.forEach(ev=>{const r=ev.r;
+    let tag='';
+    if(ev.first)tag='<span class="psDelta psFirst">první start</span>';
+    else if(ev.delta>0)tag='<span class="psDelta psUp">+'+fmt(ev.delta)+'</span>';
+    else if(ev.delta<0)tag='<span class="psDelta psDown">'+fmt(ev.delta)+'</span>';
+    else tag='<span class="psDelta psDown">stejně</span>';
+    let tags='';
+    if(ev.pb)tags+='<span class="psTag psPB">osobák</span>';
+    if(ev.newMcr)tags+='<span class="psTag psLim">poprvé nad MČR</span>';
+    if(ev.newMs)tags+='<span class="psTag psLim">limit MS</span>';
+    h+='<div class="psRow"><span class="pm">'+(r.pl&&r.pl<=3?MED[r.pl]:(r.pl?r.pl+'.':''))+'</span><span class="d"><b>'+esc(dcName(r.disc))+'</b> <span class="psLvl">'+r.lc+'</span></span>'+
+      '<span class="sc">'+fmt(r.score)+'</span>'+tag+tags;
+    const g=r.fv!=null?gapInfo(r):null;
+    if(g){const nx=g.targets[0];
+      h+='<span class="psTeam"><b>'+r.pl+'. místo</b> z '+g.n+
+        (nx?' · '+nx.lab+' '+(isSpeed(r.disc)?'+'+skoky(nx.gap):'+'+body(nx.gap))+' ('+esc(nx.club)+')':' · vítězství')+
+        (r.fs?' · D '+fmt(r.fs.D)+' · P '+fmt(r.fs.P)+(r.fs.Q!=null?' · povinné prvky '+pct(r.fs.Q):'')+' · srážky '+(r.fs.M>=1?'0 %':'−'+pct(1-r.fs.M)):'')+
+        (r.sm?' · chybný start −'+skoky(r.sm):'')+'</span>';}
+    if(ev.prev)h+='<span class="psTeam">minule '+fmt(ev.prev.score)+' — '+esc(shortComp(ev.prev.comp))+
+      ' <span class="psLvl">'+ev.prev.lc+'</span>'+(ev.prev.lc!==r.lc?' · jiná úroveň závodu':'')+'</span>';
+    if(TEAM.has(r.disc))h+='<span class="psTeam">s '+r.members.filter(m=>m.aid!==a.aid).map(m=>esc(firstName(m.name))).join(', ')+'</span>';
+    h+='</div>';});
+  if(moves){
+    const lc=nxtC===2?'junior':nxtC===3?'senior':null,H=histIdx();
+    const seen={},lines=[];
+    a.items.forEach(ev=>{const r=ev.r;if(seen[r.disc])return;seen[r.disc]=1;
+      const lim=limitFor(r.disc,lc,'ms');if(lim==null)return;
+      const mine=(H.get(a.aid+'|'+r.disc)||[]).reduce((m,x)=>Math.max(m,x.score),0);
+      lines.push('<div class="psNextRow"><span>'+esc(dcName(r.disc))+'</span><b>'+fmt(lim)+'</b>'+
+        (mine>=lim?'<span class="psTag psLim">splněno, máš '+fmt(mine)+'</span>':'<span class="psTag psGap">chybí '+fmt(lim-mine)+'</span>')+'</div>');});
+    h+='<div class="psNextBox"><div class="t">Od 1. 1. '+NEXT_SEASON+' závodíš v kategorii '+catLabelLvl(nxtC)+'</div>'+
+      (lines.length?'<div class="s">Limity na MS, které na tebe v nové kategorii platí, a tvé nejlepší výkony:</div>'+lines.join('')
+        :'<div class="s">Limity na MS se v nové kategorii nemění, čeká tě ale silnější konkurence.</div>')+'</div>';
+  }
+  c.innerHTML=h;
+  c.querySelector('[data-k="karta"]').onclick=()=>{state.selAid=a.aid;state.q='';document.getElementById('q').value='';setMode('karta');window.scrollTo(0,0);};
+  c.querySelector('[data-k="close"]').onclick=()=>{state.psSel=null;render();};
+  return c;
+}
+function psSection(title,sub){const s=document.createElement('section');s.className='psSec';
+  s.innerHTML='<div class="psSecH">'+title+'</div>'+(sub?'<div class="psSecS">'+sub+'</div>':'');return s;}
 function renderPosun(host){
   const clubs=posunClubs();
   const list=[...new Set(P.filter(r=>r.club&&clubs.has(r.club)).map(r=>r.comp))]
@@ -625,101 +807,79 @@ function renderPosun(host){
   if(!list.length){host.innerHTML='<div class="khint">Pro zvolený oddíl nejsou žádné výsledky.</div>';buildPosunChips([]);return;}
   if(!state.posunComp||list.indexOf(state.posunComp)<0)state.posunComp=list[0];
   buildPosunChips(list);
-  const comp=state.posunComp,cd=compDate[comp]||'',H=histIdx();
-  const byAth=new Map();
-  P.filter(r=>r.comp===comp&&r.club&&clubs.has(r.club)).forEach(r=>r.members.forEach(mm=>{
-    if(!byAth.has(mm.aid))byAth.set(mm.aid,{aid:mm.aid,name:mm.name,club:r.club,items:[]});
-    byAth.get(mm.aid).items.push(r);}));
-  if(state.q){for(const [k,a] of [...byAth]) if(!a.name.toLowerCase().includes(state.q)) byAth.delete(k);}
-  if(!byAth.size){host.innerHTML='<div class="khint">'+(state.q?'Nikdo s tímto jménem na závodě nestartoval.':'Na tomto závodě nikdo z oddílu nestartoval.')+'</div>';return;}
-
-  let nPB=0,nMcr=0,nMs=0,nStart=0;const wins=[];
-  byAth.forEach(a=>{
-    const cat=ATH[a.aid]===2?'junior':ATH[a.aid]===3?'senior':null;
-    a.items.forEach(r=>{
-      const h=(H.get(a.aid+'|'+r.disc)||[]).filter(x=>(x.date||'')<cd);
-      const prev=h.length?h[h.length-1]:null;
-      const bb=h.length?Math.max.apply(null,h.map(x=>x.score)):null;
-      r._prev=prev;r._delta=prev?r.score-prev.score:null;
-      r._pb=bb!==null&&r.score>bb;r._first=bb===null;
-      const lm=limitFor(r.disc,cat,'mcr'),ls=limitFor(r.disc,cat,'ms');
-      r._newMcr=lm!=null&&r.score>=lm&&(bb===null||bb<lm);
-      r._newMs=ls!=null&&r.score>=ls&&(bb===null||bb<ls);
-      nStart++;if(r._pb)nPB++;if(r._newMcr)nMcr++;if(r._newMs)nMs++;
-      if(r._delta>0)wins.push({n:a.name.split(' ')[0],d:r.disc,v:r._delta,s:r.score});
-    });
-    a.items.sort((x,y)=>((DISC_ORDER.indexOf(x.disc)+1||99)-(DISC_ORDER.indexOf(y.disc)+1||99)));
-  });
-
+  const S=compSummary(state.posunComp,clubs);
+  const lvls=[...new Set(S.ours.map(r=>r.lc))].sort();
+  const intl=!S.hasField;
+  const nDisc=new Set(S.ours.map(r=>r.disc)).size;
   const hd=document.createElement('div');hd.className='psHead';
-  hd.innerHTML='<div class="t">'+esc(comp)+'</div><div class="s">'+czDate(cd)+' · '+byAth.size+
-    ' závodnic a závodníků · '+nStart+' startů</div>';
+  hd.innerHTML='<div class="t">'+esc(S.comp)+'</div><div class="s">'+czDate(S.cd)+' · '+
+    (intl?'mezinárodní závod':'úroveň '+lvls.join(' + '))+' · '+S.athMap.size+' '+cz(S.athMap.size,'závodník','závodníci','závodníků')+
+    ' · '+S.ours.length+' '+cz(S.ours.length,'start','starty','startů')+' v '+nDisc+' '+cz(nDisc,'disciplíně','disciplínách','disciplínách')+'</div>';
   host.appendChild(hd);
 
-  wins.sort((x,y)=>y.v-x.v);
-  const bits=[];
-  if(nPB)bits.push('<b>'+nPB+'×</b> osobní rekord');
-  if(nMcr)bits.push('<b>'+nMcr+'×</b> poprvé nad limitem MČR');
-  if(nMs)bits.push('<b>'+nMs+'×</b> poprvé nad limitem MS');
-  if(bits.length||wins.length){
-    const w=document.createElement('div');w.className='psWin';
-    let t=bits.length?bits.join(' · '):'Žádný osobní rekord, ale to se stává — podívejte se na jednotlivé posuny.';
-    if(wins.length)t+='<br>Největší zlepšení: '+wins.slice(0,3).map(x=>esc(x.n)+' '+x.d+' o '+fmt(x.v)).join(' · ');
-    w.innerHTML=t;host.appendChild(w);
-  }
+  /* dlaždice */
+  const tl=document.createElement('div');tl.className='psTiles';
+  const tot=S.med.g+S.med.s+S.med.b;
+  const tile=(n,t,cls)=>'<div class="psTile '+(cls||'')+'"><div class="n">'+n+'</div><div class="t">'+t+'</div></div>';
+  let th='';
+  if(!intl)th+='<div class="psTile med"><div class="n">'+tot+'</div><div class="t">'+cz(tot,'medaile','medaile','medailí')+'</div><div class="mm"><span>🥇 '+S.med.g+'</span><span>🥈 '+S.med.s+'</span><span>🥉 '+S.med.b+'</span></div></div>';
+  th+=tile(S.pbs.length,cz(S.pbs.length,'osobní rekord','osobní rekordy','osobních rekordů'),'pb');
+  th+=tile(S.clubRec.length,cz(S.clubRec.length,'rekord oddílu','rekordy oddílu','rekordů oddílu'),'cr');
+  th+=tile(S.newMs.length,'nově limit MS/ME','ok');
+  tl.innerHTML=th;host.appendChild(tl);
+  if(intl){const n=document.createElement('div');n.className='psNote';
+    n.textContent='U mezinárodních závodů nemáme celou výsledkovou listinu, proto tu nejsou medaile ani srovnání s oddíly – jen posun proti vlastní historii.';host.appendChild(n);}
 
-  [...byAth.values()].sort((a,b)=>a.name.localeCompare(b.name,'cs')).forEach(a=>{
-    const c=document.createElement('div');c.className='psAth';
-    const curC=ATH[a.aid],nxtC=NEXTCAT[a.aid];
-    const moves=NEXT_SEASON&&nxtC!=null&&curC!=null&&nxtC!==curC;
-    let h='<div class="h"><span class="nm">'+esc(a.name)+'</span><span class="meta">'+
-      catLabelLvl(curC!=null?curC:null)+'</span>'+
-      (moves?'<span class="psTag psNext">od ledna '+catLabelLvl(nxtC)+'</span>':'')+'</div>';
-    a.items.forEach(r=>{
-      let tag='';
-      if(r._first)tag='<span class="psDelta psFirst">první start</span>';
-      else if(r._delta>0)tag='<span class="psDelta psUp">+'+fmt(r._delta)+'</span>';
-      else if(r._delta<0)tag='<span class="psDelta psDown">'+fmt(r._delta)+'</span>';
-      else tag='<span class="psDelta psDown">stejně</span>';
-      let tags='';
-      if(r._pb)tags+='<span class="psTag psPB">osobák</span>';
-      if(r._newMcr)tags+='<span class="psTag psLim">poprvé nad MČR</span>';
-      if(r._newMs)tags+='<span class="psTag psLim">limit MS</span>';
-      h+='<div class="psRow"><span class="d"><b>'+esc(dcName(r.disc))+'</b></span>'+
-        '<span class="sc">'+fmt(r.score)+'</span>'+tag+tags;
-      {const g=r.fv!=null?gapInfo(r):null;
-        if(g){const nx=g.targets[0];
-          h+='<span class="psTeam"><b>'+r.pl+'. místo</b> z '+g.n+
-            (nx?' · na '+nx.k+'. '+(isSpeed(r.disc)?'+'+skoky(nx.gap):'+'+body(nx.gap))+' ('+esc(nx.club)+')':' · 🏆')+
-            (r.fs?' · D '+fmt(r.fs.D)+' · P '+fmt(r.fs.P)+(r.fs.Q!=null?' · Q '+pct(r.fs.Q):'')+' · srážky '+(r.fs.M>=1?'0 %':'−'+pct(1-r.fs.M)):'')+
-            (r.sm?' · chybný start −'+skoky(r.sm):'')+'</span>';}}
-      if(r._prev)h+='<span class="psTeam">minule '+fmt(r._prev.score)+' — '+esc(shortComp(r._prev.comp))+
-        ' <span class="psLvl">'+r._prev.lc+'</span>'+(r._prev.lc!==r.lc?' · jiná úroveň závodu':'')+'</span>';
-      if(TEAM.has(r.disc))h+='<span class="psTeam">s '+r.members.filter(m=>m.aid!==a.aid).map(m=>esc(m.name.split(' ')[0])).join(', ')+'</span>';
-      h+='</div>';
-    });
-    if(moves){
-      const lc=nxtC===2?'junior':nxtC===3?'senior':null;
-      const seen={},lines=[];
-      a.items.forEach(r=>{
-        if(seen[r.disc])return;seen[r.disc]=1;
-        const lim=limitFor(r.disc,lc,'ms');if(lim==null)return;
-        const mine=(H.get(a.aid+'|'+r.disc)||[]).reduce((m,x)=>Math.max(m,x.score),0);
-        const ok=mine>=lim;
-        lines.push('<div class="psNextRow"><span>'+esc(dcName(r.disc))+'</span>'+
-          '<b>'+fmt(lim)+'</b>'+
-          (ok?'<span class="psTag psLim">splněno, máš '+fmt(mine)+'</span>'
-             :'<span class="psTag psGap">chybí '+fmt(lim-mine)+'</span>')+'</div>');
-      });
-      const box=document.createElement('div');box.className='psNextBox';
-      box.innerHTML='<div class="t">Od 1. 1. '+NEXT_SEASON+' závodíš v kategorii '+catLabelLvl(nxtC)+'</div>'+
-        (lines.length?'<div class="s">Limity na MS, které na tebe v nové kategorii platí, a tvé nejlepší výkony:</div>'+lines.join('')
-                     :'<div class="s">Limity na MS se v nové kategorii nemění, čeká tě ale silnější konkurence.</div>');
-      h+=box.outerHTML;
-    }
-    c.innerHTML=h;host.appendChild(c);
-  });
-  document.getElementById('count').innerHTML='<b>'+byAth.size+'</b> závodnic a závodníků na závodě '+esc(shortComp(comp));
+  /* závěry */
+  const C=conclusions(S,clubs);
+  if(C.length){const s=psSection('Závěry');
+    s.insertAdjacentHTML('beforeend','<ul class="psConc">'+C.map(c=>'<li><span class="i">'+c.i+'</span><span>'+c.t+'</span></li>').join('')+'</ul>');
+    host.appendChild(s);}
+
+  /* medaile */
+  if(S.medals.length){const s=psSection('Medaile',tot+' '+cz(tot,'medaile','medaile','medailí')+' · týmová disciplína = jedna medaile');
+    let h='<div class="psMedList">';
+    S.medals.forEach(r=>{const f=fieldOf(r);
+      h+='<div class="psMed"><span class="m">'+MED[r.pl]+'</span><span class="d"><b>'+esc(dcName(r.disc))+'</b><span class="c">'+catLabelLvl(r.al)+' · '+genLabel(r.gender)+(lvls.length>1?' · '+r.lc:'')+(f?' · z '+f.e.length:'')+'</span></span>'+
+        '<span class="w">'+r.members.map(m=>'<button class="psName" data-aid="'+m.aid+'">'+esc(TEAM.has(r.disc)?firstName(m.name)+' '+(m.name.split(' ').slice(1).join(' ')[0]||'')+'.':m.name)+'</button>').join(' ')+'</span>'+
+        '<span class="sc">'+fmt(r.score)+'</span></div>';});
+    s.insertAdjacentHTML('beforeend',h+'</div>');host.appendChild(s);}
+
+  /* srovnání s oddíly */
+  if(S.hasField&&S.rows.length){const s=psSection('Jak jsme si stáli mezi oddíly','Pořadí podle zlatých, pak stříbrných a bronzových'+(lvls.length>1?', A i B dohromady':'')+'. České oddíly; zahraniční závodníci jsou započtení v umístěních, ale v tabulce nejsou.');
+    const top=S.rows.slice(0,8);S.rows.forEach(t=>{if(clubs.has(t.club)&&top.indexOf(t)<0)top.push(t);});
+    let h='<table class="psTab"><thead><tr><th></th><th>oddíl</th><th>🥇</th><th>🥈</th><th>🥉</th><th>Σ</th><th class="hs">startů</th><th class="hs">úspěšnost</th></tr></thead><tbody>';
+    top.forEach(t=>{h+='<tr'+(clubs.has(t.club)?' class="me"':'')+'><td>'+t.rk+'.</td><td>'+esc(t.club)+'</td><td>'+t.g+'</td><td>'+t.s+'</td><td>'+t.b+'</td><td><b>'+t.m+'</b></td><td class="hs">'+t.n+'</td><td class="hs">'+pct(t.n?t.m/t.n:0)+'</td></tr>';});
+    h+='</tbody></table>';if(S.rows.length>top.length)h+='<div class="psSecS">+ '+(S.rows.length-top.length)+' dalších oddílů</div>';
+    s.insertAdjacentHTML('beforeend',h);host.appendChild(s);}
+
+  /* rekordy a limity */
+  if(S.clubRec.length||S.newMs.length||S.newMcr.length){const s=psSection('Rekordy a limity','Rekord oddílu = nejlepší výkon oddílu ve stejné disciplíně, kategorii a pohlaví, co máme data (od '+czDate(P.reduce((m,x)=>x.date&&x.date<m?x.date:m,'9999'))+').');
+    let h='<div class="psRecs">';
+    S.clubRec.forEach(r=>{h+='<div class="psRec"><span class="psTag psCR">rekord oddílu</span><b>'+esc(dcName(r.disc))+'</b> <span class="c">'+catLabelLvl(r.al)+' · '+genLabel(r.gender)+'</span> · '+who(r)+' <b>'+fmt(r.score)+'</b> <span class="c">(dosud '+fmt(r._clubPrev)+')</span></div>';});
+    S.newMs.forEach(r=>{h+='<div class="psRec"><span class="psTag psLim">limit MS/ME</span><b>'+esc(dcName(r.disc))+'</b> · '+who(r)+' <b>'+fmt(r.score)+'</b></div>';});
+    S.newMcr.forEach(r=>{h+='<div class="psRec"><span class="psTag psGap">limit MČR</span><b>'+esc(dcName(r.disc))+'</b> · '+who(r)+' <b>'+fmt(r.score)+'</b></div>';});
+    s.insertAdjacentHTML('beforeend',h+'</div>');host.appendChild(s);}
+
+  /* závodníci */
+  const s=psSection('Závodníci','Klikni na jméno – ukáže se detail. Hledat můžeš i nahoře.');
+  let ath=[...S.athMap.values()].sort((a,b)=>a.name.localeCompare(b.name,'cs'));
+  if(state.q)ath=ath.filter(a=>a.name.toLowerCase().includes(state.q));
+  if(state.q&&ath.length===1)state.psSel=ath[0].aid;
+  const grid=document.createElement('div');grid.className='psGrid';
+  ath.forEach(a=>{const b=document.createElement('button');b.className='psChip'+(state.psSel===a.aid?' on':'');
+    const m=a.items.map(ev=>ev.r.pl).filter(p=>p>=1&&p<=3).sort().map(p=>MED[p]).join('');
+    const pb=a.items.filter(ev=>ev.pb).length;
+    b.innerHTML='<span class="nm">'+esc(a.name)+'</span><span class="mx">'+m+(pb?'<span class="pbn">'+pb+'× osobák</span>':'')+'</span>';
+    b.onclick=()=>{state.psSel=state.psSel===a.aid?null:a.aid;render();
+      const d=document.getElementById('psDetail');if(d)d.scrollIntoView({behavior:'smooth',block:'start'});};
+    grid.appendChild(b);});
+  if(!ath.length)grid.innerHTML='<div class="khint">Nikdo s tímto jménem na závodě nestartoval.</div>';
+  s.appendChild(grid);host.appendChild(s);
+  if(state.psSel&&S.athMap.has(state.psSel))s.appendChild(athDetail(S.athMap.get(state.psSel),S));
+  host.querySelectorAll('.psName').forEach(b=>b.onclick=()=>{state.psSel=b.dataset.aid;render();
+    const d=document.getElementById('psDetail');if(d)d.scrollIntoView({behavior:'smooth',block:'start'});});
+  document.getElementById('count').innerHTML='<b>'+esc(shortComp(S.comp))+'</b> · '+S.athMap.size+' '+cz(S.athMap.size,'závodník','závodníci','závodníků');
 }
 function setMode(m){state.mode=m;
   document.getElementById('mRank').setAttribute('aria-pressed',m==='rank');
