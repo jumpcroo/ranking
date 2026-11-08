@@ -1,0 +1,8 @@
+{
+  "_popis": "Plán: další závod a nominace. Upravuje se ručně při změně.",
+  "nextComp": {"name": "S-BEE Games", "date": "2026-11-28", "levels": "A i B",
+    "discs": ["SRSS", "SRSE", "SRTU", "SRSR", "SRDR", "DDSS", "DDSR", "DDCS"],
+    "note": "jen rychlostní disciplíny"},
+  "nomination": {"name": "MS 2027 (Norsko)", "deadline": "2026-12-19", "decision": "2027-01-03",
+    "note": "Nominace se spouští začátkem prosince 2026, poslední započítávaný závod je S-BEE 28. 11. 2026."}
+}

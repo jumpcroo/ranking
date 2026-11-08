@@ -258,6 +258,22 @@ header{position:sticky;top:0;z-index:30;background:var(--navy);color:#fff;box-sh
 .ovRow.me{color:var(--navy);font-weight:700}.dOvList .gap{text-align:center;color:var(--muted);padding:2px 0}
 .dOvAvg{font-size:14px;margin:2px 0 8px;color:var(--ink)}
 .dOvNote{font-size:12.5px;color:var(--muted);margin-top:8px;line-height:1.5}
+.plCard .anH{font-size:17px}
+.plRow{padding:12px 0;border-top:1px solid var(--line)}
+.plD{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline;font-size:15px}
+.plM{font-size:13px;color:var(--muted)}.plB{display:block;font-size:12.5px;color:var(--muted)}.plD .plB{display:inline}
+.plG{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.plGoal{display:grid;grid-template-columns:minmax(150px,210px) 80px 1fr;gap:4px 12px;align-items:baseline;background:var(--warn-bg);border-radius:10px;padding:8px 12px;font-size:14px}
+.plGoal.rk{background:var(--navy-tint)}.plGoal.ok{display:block;background:var(--ok-bg);color:var(--ok);font-weight:600}
+.plGoal .k{font-weight:600}.plGoal .x{font-family:Poppins,sans-serif;font-weight:700;font-size:18px}.plGoal .n{font-size:13px;color:var(--muted)}
+.plGoal .hard{color:var(--bad);font-weight:600}.plGoal .ok{color:var(--ok);font-weight:600}
+@media (max-width:560px){.plGoal{grid-template-columns:1fr auto}.plGoal .n{grid-column:1/-1}}
+.plTab{display:flex;flex-direction:column}
+.plTr{display:grid;grid-template-columns:1.2fr 1.3fr 1fr;gap:6px 12px;padding:10px 0;border-top:1px solid var(--line);font-size:14px;align-items:start}
+.plTr .plM{display:block}.plTr .dim{color:var(--muted)}
+.plS{display:inline-block;font-size:12.5px;font-weight:700;padding:3px 8px;border-radius:6px}
+.plS.ok{background:var(--ok-bg);color:var(--ok)}.plS.no{background:var(--warn-bg);color:var(--warn)}.plS.na{background:var(--chip);color:var(--muted)}
+@media (max-width:560px){.plTr{grid-template-columns:1fr 1fr}.plTr .d{grid-column:1/-1}}
 .dSum{margin-top:18px;border-top:2px solid var(--navy);padding-top:14px}
 .dSumH{font-family:Poppins,sans-serif;font-weight:700;font-size:19px;margin-bottom:10px}
 .dSumG{border-radius:12px;padding:12px 14px;margin-bottom:10px;font-size:15px;line-height:1.55}
@@ -659,11 +675,113 @@ function renderKarta(host){
   host.appendChild(list);
 }
 /*__ANALYZA__*/
+/* ---------- Cíle na příští závod a nominace (Karta) ----------
+   Nominační pořadí = součet dvou nejlepších výsledků z A (a mezinárodních) za
+   10 celých kalendářních měsíců před datem nominace, při shodě rozhoduje novější
+   výsledek. Limity = nejlepší výkon z A i B. Kategorie pro MS 2027 = kategorie
+   sezóny 2027 (data/kategorie.json). Pořadí v nové kategorii je odhad: ostatní
+   oddíly počítáme v jejich dnešní kategorii, protože jejich ročníky neznáme. */
+const PLAN=DATA.plan||null;
+function winFromOf(d){const y=+d.slice(0,4),m=+d.slice(5,7);let mm=m-10,yy=y;while(mm<1){mm+=12;yy--;}return yy+'-'+String(mm).padStart(2,'0')+'-01';}
+const todayIso=()=>{const t=new Date();return t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');};
+const daysTo=d=>Math.round((new Date(d+'T12:00:00')-new Date(todayIso()+'T12:00:00'))/864e5);
+const _rb={};
+function rankBuckets(from){if(_rb[from])return _rb[from];
+  const ents=entities(P.filter(r=>r.cR&&(r.date||'')>=from)).filter(o=>o.lvl!=null);
+  ents.forEach(o=>{o.tt=topTwo(o.recs);o.sum=o.tt.reduce((t,r)=>t+r.score,0);o.nd=o.tt[0]?o.tt[0].date||'':'';});
+  const B={};ents.forEach(o=>{const k=o.disc+'|'+dispCatsFor(o.lvl)[0]+'|'+(o.gender||'');(B[k]=B[k]||[]).push(o);});
+  Object.values(B).forEach(a=>a.sort((x,y)=>y.sum-x.sum||y.nd.localeCompare(x.nd)));
+  return _rb[from]={ents,B};}
+const mine=(o,aid)=>o.kind==='ind'?o.aid===aid:o.members.some(m=>m.aid===aid);
+/* pořadí (a cíle) v kategorii cat; self = entita závodnice nebo null */
+function rankIn(disc,cat,gen,self,from){
+  const B=rankBuckets(from).B[disc+'|'+dispCatsFor(cat)[0]+'|'+(gen||'')]||[];
+  const others=B.filter(o=>o!==self&&!(self&&self.kind==='ind'&&o.kind==='ind'&&o.aid===self.aid));
+  const S=self?self.sum:0,nd=self?self.nd:'';
+  const rk=1+others.filter(o=>o.sum>S||(o.sum===S&&o.nd>nd)).length;
+  return{rk,n:others.length+1,others};}
+/* jaký výsledek na příštím závodě je potřeba, aby součet dvou nejlepších předběhl o (nový výsledek je nejnovější, takže shoda stačí) */
+function needToPass(self,o){const t0=self&&self.tt[0]?self.tt[0].score:0,t1=self&&self.tt[1]?self.tt[1].score:null;
+  const x=o.sum-t0;if(t1!=null&&x<=t1)return null;return x;}
+const roundUp=(x,sp)=>sp?Math.ceil(x*2)/2:Math.ceil(x*100)/100;
+function planRows(a){
+  if(!PLAN)return null;
+  const nom=PLAN.nomination,nc=PLAN.nextComp,from=winFromOf(nom.deadline);
+  const cat26=a.lvl,cat27=(NEXTCAT[a.aid]!=null)?NEXTCAT[a.aid]:cat26,lc27=cat27===2?'junior':cat27===3?'senior':null;
+  const ncOpen=nc&&daysTo(nc.date)>=0;
+  const perfs=P.filter(r=>r.members.some(m=>m.aid===a.aid)&&(r.date||'')>=from);
+  const discs=[...new Set(perfs.map(r=>r.disc))].sort((x,y)=>discOrd(x)-discOrd(y));
+  const {ents}=rankBuckets(from);
+  const rows=discs.map(d=>{
+    const team=TEAM.has(d),sp=isSpeed(d);
+    /* nejlepší sestava (u týmů) podle součtu dvou nejlepších */
+    const cand=ents.filter(o=>o.disc===d&&mine(o,a.aid)).sort((x,y)=>y.sum-x.sum);
+    const self=cand[0]||null;
+    const lp=perfs.filter(r=>r.disc===d&&r.cL);const best=lp.length?Math.max(...lp.map(r=>r.score)):null;
+    const bestRec=lp.find(r=>r.score===best)||null;
+    const pb=Math.max(...P.filter(r=>r.disc===d&&r.members.some(m=>m.aid===a.aid)).map(r=>r.score));
+    const gen=self?self.gender:(lp[0]?lp[0].gender:a.gender);
+    const lvl=self?self.lvl:cat26;
+    const now=rankIn(d,lvl,gen,self,from);
+    const moved=!team&&cat27!==lvl&&cat27!=null;
+    const fut=moved?rankIn(d,cat27,gen,self,from):null;
+    const ref=fut||now;
+    const lm=limitFor(d,null,'mcr'),ls=lc27?limitFor(d,lc27,'ms'):null;
+    const atNext=ncOpen&&nc.discs.includes(d);
+    const goals=[];
+    if(atNext){
+      if(lm!=null&&(best==null||best<lm))goals.push({k:'Limit MČR',x:lm,gap:best==null?null:lm-best});
+      if(ls!=null&&showMs(a.aid,cat27)&&(best==null||best<ls))goals.push({k:'Limit ME/MS',x:ls,gap:best==null?null:ls-best});
+      const os=ref.others;const tgt=[];
+      if(ref.rk>1)tgt.push({k:ref.rk-1,lab:'o místo výš'});
+      if(ref.rk>4)tgt.push({k:3,lab:'na 3. místo'});
+      if(ref.rk>2)tgt.push({k:1,lab:'na 1. místo'});
+      tgt.forEach(t=>{const o=os[t.k-1];if(!o)return;const x=needToPass(self,o);if(x==null)return;
+        goals.push({k:'Ranking '+t.lab+' ('+t.k+'.)',x:roundUp(x,sp),rank:true,who:o.kind==='ind'?o.ath:o.club});});
+    }
+    return{d,team,sp,self,best,bestRec,pb,gen,lvl,now,fut,lm,ls,atNext,goals,members:self&&team?self.members:null,
+      sum:self?self.sum:0,cnt:self?self.tt.length:0};});
+  return{rows,from,cat26,cat27,lc27,nom,nc,ncOpen};
+}
+function renderPlan(host,a){
+  const R=planRows(a);if(!R||!R.rows.length)return;
+  const u=(r,x)=>r.sp?skoky(x):body(x);
+  /* Cíle na příští závod */
+  const nx=R.rows.filter(r=>r.atNext);
+  if(nx.length){const c=document.createElement('div');c.className='anCard plCard';
+    const dt=daysTo(R.nc.date);
+    let h='<div class="anH">🎯 Cíle na '+esc(R.nc.name)+'</div><div class="anSub">'+czDate(R.nc.date)+(dt>0?' · za '+dt+' '+cz(dt,'den','dny','dní'):' · dnes')+' · '+esc(R.nc.note||'')+' · úroveň '+esc(R.nc.levels||'')+'. Do rankingu se počítá jen start na A.</div>';
+    nx.forEach(r=>{h+='<div class="plRow"><div class="plD"><b>'+esc(dcName(r.d))+'</b>'+(r.members?'<span class="plM">s '+r.members.filter(m=>m.aid!==a.aid).map(m=>esc(firstName(m.name))).join(', ')+'</span>':'')+
+        '<span class="plB">nejlépe v období '+(r.best!=null?fmt(r.best):'—')+' · osobák '+fmt(r.pb)+'</span></div><div class="plG">';
+      if(!r.goals.length)h+='<span class="plGoal ok">✔ limity splněné'+(r.now.rk===1?' a 1. v ČR':'')+' – drž formu</span>';
+      r.goals.forEach(g=>{const hard=g.x>r.pb;
+        h+='<div class="plGoal'+(g.rank?' rk':'')+'"><span class="k">'+g.k+'</span><span class="x">'+fmt(g.x)+'+</span><span class="n">'+
+          (g.rank?'předběhneš '+esc(g.who||''):(g.gap!=null?'chybí '+u(r,g.gap):'zatím bez výsledku'))+
+          (hard?' · <span class="hard">nad osobákem o '+u(r,g.x-r.pb)+'</span>':' · <span class="ok">zvládneš osobákem</span>')+'</span></div>';});
+      h+='</div></div>';});
+    h+='<div class="anFoot">Ranking = součet dvou nejlepších áček od '+czDate(R.from)+' (rozhodné období k nominaci). Při shodě vyhrává novější výsledek, proto stačí vyrovnat. Počítá s tím, že ostatní se nezlepší.</div>';
+    c.innerHTML=h;host.appendChild(c);}
+  /* Nominace */
+  if(R.lc27&&showMs(a.aid,R.cat27)){const c=document.createElement('div');c.className='anCard plCard';
+    const dd=daysTo(R.nom.deadline);
+    let h='<div class="anH">✈️ Nominace '+esc(R.nom.name)+'</div><div class="anSub">Kategorie pro '+NEXT_SEASON+': <b>'+catLabelLvl(R.cat27)+'</b>'+(R.cat27!==R.cat26?' (teď '+catLabelLvl(R.cat26)+')':'')+
+      ' · přihlášky do '+czDate(R.nom.deadline)+(dd>=0?' (za '+dd+' '+cz(dd,'den','dny','dní')+')':'')+' · rozhodnutí '+czDate(R.nom.decision)+' · počítají se výsledky od '+czDate(R.from)+'.</div>';
+    h+='<div class="plTab">';
+    R.rows.forEach(r=>{const lim=r.ls;
+      const st=lim==null?'<span class="plS na">bez limitu</span>':(r.best!=null&&r.best>=lim?'<span class="plS ok">✔ limit '+fmt(lim)+'</span>':'<span class="plS no">limit '+fmt(lim)+' · chybí '+(r.best!=null?u(r,lim-r.best):'výsledek')+'</span>');
+      const rk=r.self?'<b>'+r.now.rk+'.</b> z '+r.now.n+' v ČR'+(r.fut?' · v '+catLabelLvl(R.cat27)+' odhadem <b>'+r.fut.rk+'.</b> z '+r.fut.n:''):'<span class="dim">bez áčka v období</span>';
+      h+='<div class="plTr"><div class="d"><b>'+esc(dcName(r.d))+'</b>'+(r.members?'<span class="plM">'+r.members.map(m=>esc(firstName(m.name))).join(', ')+'</span>':'')+'</div>'+
+        '<div class="r">'+rk+(r.self?'<span class="plB">součet '+fmt(r.sum)+(r.cnt<2?' (jen 1 áčko)':'')+'</span>':'')+'</div>'+
+        '<div class="s">'+st+(r.atNext?'<span class="plB">ještě S-BEE</span>':'<span class="plB">uzavřeno</span>')+'</div></div>';});
+    h+='</div><div class="anFoot">Pořadí = nominační ranking (součet dvou nejlepších áček), stav limitu z A i B. Odhad v nové kategorii počítá ostatní oddíly v jejich dnešní kategorii.</div>';
+    c.innerHTML=h;host.appendChild(c);}
+}
 function renderProfile(host,a){
   const back=document.createElement('button');back.className='backbtn';back.textContent='‹ Zpět na hledání';back.onclick=()=>{state.selAid=null;render();};host.appendChild(back);
   const hd=document.createElement('div');hd.className='profhead';
   hd.innerHTML='<div class="nm">'+(a.club==='Jumpcroo'?'★ ':'')+esc(a.name)+'</div><div class="meta"><span>'+(a.club?esc(a.club):'—')+'</span><span>·</span><span>'+genLabel(a.gender)+'</span><span>·</span><span>'+catLabelLvl(a.lvl)+'</span></div>';
   host.appendChild(hd);
+  renderPlan(host,a);
   renderStandings(host,a);
   renderRecs(host,a);
   const sh=document.createElement('div');sh.className='anH anH2';sh.textContent='Vývoj v čase a poslední závod';host.appendChild(sh);
