@@ -211,9 +211,46 @@ header{position:sticky;top:0;z-index:30;background:var(--navy);color:#fff;box-sh
 .psChip:hover{border-color:var(--navy)}.psChip.on{border-color:var(--navy);box-shadow:0 0 0 2px var(--navy) inset}
 .psChip .nm{font-weight:600;font-size:13.5px}.psChip .mx{font-size:13px;min-height:18px;display:flex;gap:6px;align-items:center}
 .pbn{font-size:10.5px;font-weight:700;color:var(--warn);background:var(--warn-bg);border-radius:5px;padding:1px 6px}
-.psPanel{max-width:680px}.psPanel .modalBody{padding:0;gap:0}
-#psDetail{margin:0;border:0;box-shadow:none;border-radius:0}
-#psDetail>.h{top:0}
+
+#psSug{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:40;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 30px rgba(20,40,90,.18);overflow:hidden}
+#psSug button{display:flex;justify-content:space-between;width:100%;border:0;background:none;padding:12px 14px;font-size:15px;color:var(--ink);text-align:left;cursor:pointer;border-top:1px solid var(--line)}
+#psSug button:first-child{border-top:0}#psSug button:hover{background:var(--navy-tint)}
+#psSug .none{padding:12px 14px;color:var(--muted);font-size:14px}
+.psPanel{max-width:none!important;width:100%;height:100%;max-height:100vh!important;border-radius:0!important}
+#psModal{align-items:stretch}
+.psPanel .modalBody{padding:0;gap:0}
+#psDetail{margin:0 auto;border:0;box-shadow:none;border-radius:0;max-width:820px;width:100%;font-size:15px}
+#psDetail>.h{top:0;padding:16px 18px;align-items:center}
+#psDetail .hl{display:flex;flex-direction:column;gap:3px}
+#psDetail>.h .nm{font-size:22px}#psDetail>.h .meta{font-size:13px}#psDetail .hm{font-size:20px;letter-spacing:2px}
+#psDetail .psBtn{font-size:14px;padding:8px 14px}
+.dBody{padding:6px 18px 30px}
+.dStart{padding:16px 0;border-top:1px solid var(--line)}.dStart:first-child{border-top:0}
+.dTop{display:flex;align-items:center;gap:10px}
+.dTop .pm{font-size:26px;min-width:34px;font-family:Poppins,sans-serif;font-weight:700;color:var(--muted)}
+.dTop .dn{flex:1;font-family:Poppins,sans-serif;font-weight:600;font-size:17px;line-height:1.3}
+.dTop .mates{display:block;font-family:Inter,sans-serif;font-weight:400;font-size:13px;color:var(--muted)}
+.dTop .sc{font-family:Poppins,sans-serif;font-weight:700;font-size:24px}
+.dTags{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 8px 44px}
+.dTags .psDelta{font-size:13px}.dTags .psTag{font-size:12px}
+.dList,.dFs{margin-left:44px}
+.dRow{display:grid;grid-template-columns:minmax(130px,190px) auto 1fr;gap:4px 12px;align-items:baseline;padding:7px 0;border-top:1px dashed var(--line);font-size:15px}
+.dRow:first-child{border-top:0}
+.dRow .k{color:var(--muted);font-size:14px}.dRow .v{font-family:Poppins,sans-serif;font-weight:600}.dRow .n{font-size:13px;color:var(--muted)}
+.dRow.warn .v{color:var(--warn)}.dRow.bad .v{color:var(--bad)}.dRow.good .v{color:var(--ok)}
+.dRow .up{color:var(--ok);font-weight:600}.dRow .down{color:var(--bad);font-weight:600}
+.dFs{margin-top:10px;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:8px 14px}
+.dFsH{font-family:Poppins,sans-serif;font-weight:600;font-size:14px;padding:4px 0}.dFsH span{font-family:Inter,sans-serif;font-weight:400;color:var(--muted);font-size:12.5px}
+@media (max-width:560px){.dList,.dFs,.dTags{margin-left:0}.dRow{grid-template-columns:1fr auto}.dRow .n{grid-column:1/-1}}
+.dSum{margin-top:18px;border-top:2px solid var(--navy);padding-top:14px}
+.dSumH{font-family:Poppins,sans-serif;font-weight:700;font-size:19px;margin-bottom:10px}
+.dSumG{border-radius:12px;padding:12px 14px;margin-bottom:10px;font-size:15px;line-height:1.55}
+.dSumG .t{font-family:Poppins,sans-serif;font-weight:600;font-size:15px;margin-bottom:4px}
+.dSumG ul{margin:0;padding-left:20px}.dSumG p{margin:0}
+.dSumG.good{background:var(--ok-bg)}.dSumG.work{background:var(--warn-bg)}.dSumG.off{background:var(--chip)}
+#psDetail .psNextBox{margin-top:16px;border-radius:12px;border:0}
+#psDetail .psNextBox .t{font-size:15px}
+
 .psRow .pm{font-size:18px;min-width:26px;font-family:Poppins,sans-serif;font-weight:700;color:var(--muted)}
 .psAct{margin-left:auto;display:flex;gap:6px}
 .psBtn{border:1px solid var(--navy);background:var(--navy);color:#fff;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:600;cursor:pointer}
@@ -757,47 +794,104 @@ function conclusions(S,clubs){
   }
   return out;
 }
+/* Detail závodníka v Závodech: přes celou obrazovku, větší písmo, údaje pod sebou,
+   na konci slovní shrnutí. Srovnání vždy s historií PŘED tímto závodem. */
+function priorOf(aid,disc,cd){return (histIdx().get(aid+'|'+disc)||[]).filter(x=>(x.date||'')<cd);}
+const avg=a=>a.length?a.reduce((s,x)=>s+x,0)/a.length:null;
+function dlRow(k,v,note,cls){return '<div class="dRow'+(cls?' '+cls:'')+'"><span class="k">'+k+'</span><span class="v">'+v+'</span>'+(note?'<span class="n">'+note+'</span>':'')+'</div>';}
+function cmpNote(cur,av,higherBetter,f){if(av==null)return '';
+  const d=cur-av;if(Math.abs(d)<1e-9)return 'jako tvůj průměr';
+  const good=higherBetter?d>0:d<0;
+  return '<span class="'+(good?'up':'down')+'">'+(d>0?'▲ ':'▼ ')+f(Math.abs(d))+'</span> proti průměru '+f(av);}
+function startBlock(a,ev,cd,acc){
+  const r=ev.r,sp=isSpeed(r.disc),u=x=>sp?skoky(x):body(x);
+  const prior=priorOf(a.aid,r.disc,cd),pScores=prior.map(x=>x.score);
+  const av=avg(pScores),best=pScores.length?Math.max(...pScores):null;
+  let h='<div class="dStart"><div class="dTop"><span class="pm">'+(r.pl&&r.pl<=3?MED[r.pl]:(r.pl?r.pl+'.':''))+'</span>'+
+    '<span class="dn">'+esc(dcName(r.disc))+' <span class="psLvl">'+r.lc+'</span>'+(TEAM.has(r.disc)?'<span class="mates">s '+r.members.filter(m=>m.aid!==a.aid).map(m=>esc(firstName(m.name))).join(', ')+'</span>':'')+'</span>'+
+    '<span class="sc">'+fmt(r.score)+'</span></div><div class="dTags">';
+  if(ev.first)h+='<span class="psDelta psFirst">první start v disciplíně</span>';
+  else if(ev.delta>0)h+='<span class="psDelta psUp">+'+fmt(ev.delta)+' proti minule</span>';
+  else if(ev.delta<0)h+='<span class="psDelta psDown">'+fmt(ev.delta)+' proti minule</span>';
+  else h+='<span class="psDelta psDown">stejně jako minule</span>';
+  if(ev.pb)h+='<span class="psTag psPB">osobní rekord</span>';
+  if(ev.newMs)h+='<span class="psTag psLim">limit MS/ME</span>';
+  if(ev.newMcr)h+='<span class="psTag psLim">poprvé nad MČR</span>';
+  h+='</div><div class="dList">';
+  const g=r.fv!=null?gapInfo(r):null;
+  if(g){h+=dlRow('Umístění','<b>'+r.pl+'.</b> z '+g.n);
+    g.targets.forEach(t=>{h+=dlRow(t.lab.charAt(0).toUpperCase()+t.lab.slice(1),'+'+u(t.gap),esc(t.club)+' · '+fmt(t.score));});
+    if(!g.targets.length)h+=dlRow('Výsledek','vítězství 🏆');}
+  if(ev.prev)h+=dlRow('Minule',fmt(ev.prev.score),esc(shortComp(ev.prev.comp))+' <span class="psLvl">'+ev.prev.lc+'</span>');
+  if(prior.length>=2)h+=dlRow('Dlouhodobý průměr',fmt(av),prior.length+' '+cz(prior.length,'start','starty','startů')+' · nejlépe '+fmt(best));
+  if(r.sm)h+=dlRow('Chybný start / výměna','−'+skoky(r.sm),'',' bad');
+  h+='</div>';
+  /* freestyle pod sebou */
+  let fa=null;
+  if(r.fs){fa=fsAnalysis(r);
+    const pf=prior.filter(x=>x.fs&&x.fs.D!=null).map(x=>x.fs);
+    const A=k=>pf.length?avg(pf.map(f=>k==='Q'?(f.Q==null?1:f.Q):k==='M'?(f.M==null?1:f.M):f[k])):null;
+    const Q=r.fs.Q==null?1:r.fs.Q,M=r.fs.M==null?1:r.fs.M;
+    h+='<div class="dFs"><div class="dFsH">Freestyle'+(pf.length?' <span>(▲▼ proti tvému průměru z '+pf.length+' '+cz(pf.length,'sestavy','sestav','sestav')+')</span>':'')+'</div>';
+    h+=dlRow('Obtížnost D','<b>'+fmt(r.fs.D)+'</b>',cmpNote(r.fs.D,A('D'),true,fmt));
+    h+=dlRow('Prezentace P','<b>'+fmt(r.fs.P)+'</b>',cmpNote(r.fs.P,A('P'),true,fmt));
+    if(r.fs.fm!=='dd')h+=dlRow('Povinné prvky','<b>'+pct(Q)+'</b>',cmpNote(Q,A('Q'),true,x=>pct(x)),Q<1?' warn':'');
+    h+=dlRow('Srážky','<b>'+(M>=1?'0 %':'−'+pct(1-M))+'</b>',cmpNote(1-M,A('M')==null?null:1-A('M'),false,x=>pct(x)),M<1?' warn':'');
+    if(fa){const L=fa.loss,parts=[];
+      if(L.miss>0.005)parts.push('missy −'+fmt(L.miss));if(L.brk>0.005)parts.push('breaky −'+fmt(L.brk));
+      if(L.viol>0.005)parts.push('porušení −'+fmt(L.viol));if(L.req>0.005)parts.push('povinné prvky −'+fmt(L.req));
+      if(parts.length)h+=dlRow('Kolik stály chyby',parts.join('<br>'),'');
+      if(fa.cleanPlace!=null&&r.pl&&fa.cleanPlace<r.pl)h+=dlRow('Bez chyb (odhad)','<b>'+fmt(fa.clean)+'</b>','→ '+fa.cleanPlace+'. místo',' good');}
+    h+='</div>';}
+  h+='</div>';
+  /* podklady pro shrnutí */
+  const nm=dcName(r.disc);
+  const rel=av?(r.score-av)/av:null;
+  if(ev.pb)acc.good.push('<b>'+esc(nm)+'</b>: osobní rekord '+fmt(r.score)+(best!=null?' (dosud '+fmt(best)+')':''));
+  else if(ev.delta>0&&rel!=null&&rel>0)acc.good.push('<b>'+esc(nm)+'</b>: +'+fmt(ev.delta)+' proti minule, nad dlouhodobým průměrem');
+  if(ev.newMs)acc.good.push('<b>'+esc(nm)+'</b>: nově splněný limit MS/ME');
+  if(r.fs&&fa&&prior.some(x=>x.fs)){const pf=prior.filter(x=>x.fs&&x.fs.D!=null).map(x=>x.fs);
+    const aD=avg(pf.map(f=>f.D)),aP=avg(pf.map(f=>f.P));
+    if(aD!=null&&r.fs.D>aD*1.05)acc.good.push('<b>'+esc(nm)+'</b>: vyšší obtížnost ('+fmt(r.fs.D)+' proti průměru '+fmt(aD)+')');
+    if(aP!=null&&r.fs.P>aP+0.02)acc.good.push('<b>'+esc(nm)+'</b>: lepší prezentace ('+fmt(r.fs.P)+' proti průměru '+fmt(aP)+')');}
+  if(rel!=null&&prior.length>=2&&rel<-0.03&&!ev.pb)
+    acc.off.push('<b>'+esc(nm)+'</b>: tentokrát '+fmt(r.score)+', dlouhodobý průměr je '+fmt(av)+' a nejlépe '+fmt(best)+
+      (best!=null&&best>=r.score*1.05?' – na víc to je, jde spíš o horší den':''));
+  else if(ev.delta<0&&prior.length===1)acc.off.push('<b>'+esc(nm)+'</b>: '+fmt(r.score)+' proti minulým '+fmt(ev.prev.score));
+  if(fa){const L=fa.loss,miss=L.miss+L.presMiss;
+    if(fa.cleanPlace!=null&&r.pl&&fa.cleanPlace<r.pl)acc.work.push('<b>'+esc(nm)+'</b>: čistota – chyby stály zhruba '+body(miss+L.brk+L.viol+L.req)+', bez nich by to bylo '+fa.cleanPlace+'. místo');
+    else if(miss>0.05)acc.work.push('<b>'+esc(nm)+'</b>: missy stály '+body(miss));
+    if(r.fs.Q!=null&&r.fs.Q<1)acc.work.push('<b>'+esc(nm)+'</b>: chybějící povinné prvky ('+pct(r.fs.Q)+')');}
+  if(r.sm)acc.work.push('<b>'+esc(nm)+'</b>: chybný start nebo výměna stál '+skoky(r.sm));
+  if(g&&r.pl>1){const t=g.targets[0];if(t&&t.score&&t.gap/t.score<=0.03)acc.work.push('<b>'+esc(nm)+'</b>: na '+t.k+'. místo chybělo jen '+u(t.gap));}
+  return h;
+}
 function athDetail(a,S){
   const c=document.createElement('div');c.className='psAth';c.id='psDetail';
   const curC=ATH[a.aid],nxtC=NEXTCAT[a.aid];
   const moves=NEXT_SEASON&&nxtC!=null&&curC!=null&&nxtC!==curC;
-  let h='<div class="h"><span class="nm">'+esc(a.name)+'</span><span class="meta">'+catLabelLvl(curC!=null?curC:null)+'</span>'+
-    (moves?'<span class="psTag psNext">od ledna '+catLabelLvl(nxtC)+'</span>':'')+
-    '<span class="psAct"><button class="psBtn" data-k="karta">Karta ›</button><button class="psBtn ghost" data-k="close" aria-label="Zavřít">✕</button></span></div>';
-  a.items.forEach(ev=>{const r=ev.r;
-    let tag='';
-    if(ev.first)tag='<span class="psDelta psFirst">první start</span>';
-    else if(ev.delta>0)tag='<span class="psDelta psUp">+'+fmt(ev.delta)+'</span>';
-    else if(ev.delta<0)tag='<span class="psDelta psDown">'+fmt(ev.delta)+'</span>';
-    else tag='<span class="psDelta psDown">stejně</span>';
-    let tags='';
-    if(ev.pb)tags+='<span class="psTag psPB">osobák</span>';
-    if(ev.newMcr)tags+='<span class="psTag psLim">poprvé nad MČR</span>';
-    if(ev.newMs)tags+='<span class="psTag psLim">limit MS</span>';
-    h+='<div class="psRow"><span class="pm">'+(r.pl&&r.pl<=3?MED[r.pl]:(r.pl?r.pl+'.':''))+'</span><span class="d"><b>'+esc(dcName(r.disc))+'</b> <span class="psLvl">'+r.lc+'</span></span>'+
-      '<span class="sc">'+fmt(r.score)+'</span>'+tag+tags;
-    const g=r.fv!=null?gapInfo(r):null;
-    if(g){const nx=g.targets[0];
-      h+='<span class="psTeam"><b>'+r.pl+'. místo</b> z '+g.n+
-        (nx?' · '+nx.lab+' '+(isSpeed(r.disc)?'+'+skoky(nx.gap):'+'+body(nx.gap))+' ('+esc(nx.club)+')':' · vítězství')+
-        (r.fs?' · D '+fmt(r.fs.D)+' · P '+fmt(r.fs.P)+(r.fs.Q!=null?' · povinné prvky '+pct(r.fs.Q):'')+' · srážky '+(r.fs.M>=1?'0 %':'−'+pct(1-r.fs.M)):'')+
-        (r.sm?' · chybný start −'+skoky(r.sm):'')+'</span>';}
-    if(ev.prev)h+='<span class="psTeam">minule '+fmt(ev.prev.score)+' — '+esc(shortComp(ev.prev.comp))+
-      ' <span class="psLvl">'+ev.prev.lc+'</span>'+(ev.prev.lc!==r.lc?' · jiná úroveň závodu':'')+'</span>';
-    if(TEAM.has(r.disc))h+='<span class="psTeam">s '+r.members.filter(m=>m.aid!==a.aid).map(m=>esc(firstName(m.name))).join(', ')+'</span>';
-    h+='</div>';});
+  const med=a.items.map(ev=>ev.r.pl).filter(p=>p>=1&&p<=3).sort().map(p=>MED[p]).join(' ');
+  let h='<div class="h"><div class="hl"><span class="nm">'+esc(a.name)+'</span><span class="meta">'+catLabelLvl(curC!=null?curC:null)+' · '+esc(shortComp(S.comp))+' · '+a.items.length+' '+cz(a.items.length,'start','starty','startů')+'</span>'+
+    (med?'<span class="hm">'+med+'</span>':'')+'</div>'+
+    '<span class="psAct"><button class="psBtn" data-k="karta">Celá karta ›</button><button class="psBtn ghost" data-k="close" aria-label="Zavřít">✕</button></span></div><div class="dBody">';
+  const acc={good:[],work:[],off:[]};
+  a.items.forEach(ev=>{h+=startBlock(a,ev,S.cd,acc);});
   if(moves){
     const lc=nxtC===2?'junior':nxtC===3?'senior':null,H=histIdx();
     const seen={},lines=[];
     a.items.forEach(ev=>{const r=ev.r;if(seen[r.disc])return;seen[r.disc]=1;
       const lim=limitFor(r.disc,lc,'ms');if(lim==null)return;
       const mine=(H.get(a.aid+'|'+r.disc)||[]).reduce((m,x)=>Math.max(m,x.score),0);
-      lines.push('<div class="psNextRow"><span>'+esc(dcName(r.disc))+'</span><b>'+fmt(lim)+'</b>'+
-        (mine>=lim?'<span class="psTag psLim">splněno, máš '+fmt(mine)+'</span>':'<span class="psTag psGap">chybí '+fmt(lim-mine)+'</span>')+'</div>');});
+      lines.push(dlRow(esc(dcName(r.disc)),'limit <b>'+fmt(lim)+'</b>',mine>=lim?'<span class="up">splněno, máš '+fmt(mine)+'</span>':'chybí '+fmt(lim-mine)));});
     h+='<div class="psNextBox"><div class="t">Od 1. 1. '+NEXT_SEASON+' závodíš v kategorii '+catLabelLvl(nxtC)+'</div>'+
-      (lines.length?'<div class="s">Limity na MS, které na tebe v nové kategorii platí, a tvé nejlepší výkony:</div>'+lines.join('')
-        :'<div class="s">Limity na MS se v nové kategorii nemění, čeká tě ale silnější konkurence.</div>')+'</div>';
-  }
+      (lines.length?'<div class="s">Limity na MS v nové kategorii a tvé nejlepší výkony:</div>'+lines.join('')
+        :'<div class="s">Limity na MS se v nové kategorii nemění, čeká tě ale silnější konkurence.</div>')+'</div>';}
+  const li=a=>a.map(x=>'<li>'+x+'</li>').join('');
+  h+='<div class="dSum"><div class="dSumH">Shrnutí</div>'+
+    '<div class="dSumG good"><div class="t">💪 Co se povedlo</div>'+(acc.good.length?'<ul>'+li(acc.good)+'</ul>':'<p>Tentokrát bez osobního rekordu – výkony se držely kolem dosavadní úrovně.</p>')+'</div>'+
+    '<div class="dSumG work"><div class="t">🎯 Na čem zamakat</div>'+(acc.work.length?'<ul>'+li(acc.work)+'</ul>':'<p>Žádná výrazná slabina z tohoto závodu.</p>')+'</div>'+
+    (acc.off.length?'<div class="dSumG off"><div class="t">🌧️ Co tentokrát nevyšlo</div><ul>'+li(acc.off)+'</ul></div>':'')+
+    '</div></div>';
   c.innerHTML=h;
   c.querySelector('[data-k="karta"]').onclick=()=>{state.psSel=null;psOpen(null);state.selAid=a.aid;state.q='';document.getElementById('q').value='';setMode('karta');window.scrollTo(0,0);};
   c.querySelector('[data-k="close"]').onclick=()=>{state.psSel=null;psOpen(null);render();};
@@ -816,6 +910,22 @@ function psOpen(el){
   document.body.style.overflow='hidden';
 }
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElementById('psModal')){state.psSel=null;psOpen(null);render();}});
+function psSuggest(S){
+  let box=document.getElementById('psSug');
+  const inp=document.getElementById('q');
+  if(!box){box=document.createElement('div');box.id='psSug';inp.closest('.search').style.position='relative';inp.closest('.search').appendChild(box);}
+  const q=state.mode==='posun'?state.q:'';
+  if(!q){box.hidden=true;box.innerHTML='';return;}
+  const hits=[...S.athMap.values()].filter(a=>a.name.toLowerCase().includes(q)).sort((a,b)=>a.name.localeCompare(b.name,'cs')).slice(0,8);
+  if(!hits.length){box.hidden=false;box.innerHTML='<div class="none">Nikdo takový na závodě nestartoval</div>';return;}
+  box.hidden=false;box.innerHTML='';
+  hits.forEach(a=>{const b=document.createElement('button');
+    const m=a.items.map(ev=>ev.r.pl).filter(p=>p>=1&&p<=3).sort().map(p=>MED[p]).join('');
+    b.innerHTML='<span>'+esc(a.name)+'</span><span class="m">'+m+'</span>';
+    b.onmousedown=e=>e.preventDefault();
+    b.onclick=()=>{state.psSel=a.aid;state.q='';inp.value='';box.hidden=true;render();};
+    box.appendChild(b);});
+}
 function renderPosun(host){
   const clubs=posunClubs();
   const list=[...new Set(P.filter(r=>r.club&&clubs.has(r.club)).map(r=>r.comp))]
@@ -839,6 +949,7 @@ function renderPosun(host){
   const tile=(n,t,cls)=>'<div class="psTile '+(cls||'')+'"><div class="n">'+n+'</div><div class="t">'+t+'</div></div>';
   let th='';
   if(!intl)th+='<div class="psTile med"><div class="n">'+tot+'</div><div class="t">'+cz(tot,'medaile','medaile','medailí')+'</div><div class="mm"><span>🥇 '+S.med.g+'</span><span>🥈 '+S.med.s+'</span><span>🥉 '+S.med.b+'</span></div></div>';
+  th+=tile(S.athMap.size,cz(S.athMap.size,'závodník','závodníci','závodníků'),'');
   th+=tile(S.pbs.length,cz(S.pbs.length,'osobní rekord','osobní rekordy','osobních rekordů'),'pb');
   th+=tile(S.clubRec.length,cz(S.clubRec.length,'rekord oddílu','rekordy oddílu','rekordů oddílu'),'cr');
   th+=tile(S.newMs.length,'nově limit MS/ME','ok');
@@ -877,12 +988,12 @@ function renderPosun(host){
     S.newMcr.forEach(r=>{h+='<div class="psRec"><span class="psTag psGap">limit MČR</span><b>'+esc(dcName(r.disc))+'</b> · '+who(r)+' <b>'+fmt(r.score)+'</b></div>';});
     s.insertAdjacentHTML('beforeend',h+'</div>');host.appendChild(s);}
 
+  /* našeptávač jmen v hledání */
+  psSuggest(S);
   /* závodníci */
   const s=psSection('Závodníci','Klikni na jméno – ukáže se detail. Hledat můžeš i nahoře.');
   let ath=[...S.athMap.values()].sort((a,b)=>a.name.localeCompare(b.name,'cs'));
   if(state.q)ath=ath.filter(a=>a.name.toLowerCase().includes(state.q));
-  if(state.q&&ath.length===1&&state._psQ!==state.q){state.psSel=ath[0].aid;}
-  state._psQ=state.q;
   const grid=document.createElement('div');grid.className='psGrid';
   ath.forEach(a=>{const b=document.createElement('button');b.className='psChip'+(state.psSel===a.aid?' on':'');
     const m=a.items.map(ev=>ev.r.pl).filter(p=>p>=1&&p<=3).sort().map(p=>MED[p]).join('');
@@ -896,7 +1007,7 @@ function renderPosun(host){
   host.querySelectorAll('.psName').forEach(b=>b.onclick=()=>{state.psSel=b.dataset.aid;render();});
   document.getElementById('count').innerHTML='<b>'+esc(shortComp(S.comp))+'</b> · '+S.athMap.size+' '+cz(S.athMap.size,'závodník','závodníci','závodníků');
 }
-function setMode(m){if(m!=='posun'&&typeof psOpen==='function'){state.psSel=null;psOpen(null);}state.mode=m;
+function setMode(m){if(m!=='posun'&&typeof psOpen==='function'){state.psSel=null;psOpen(null);const sb=document.getElementById('psSug');if(sb)sb.hidden=true;}state.mode=m;
   document.getElementById('mRank').setAttribute('aria-pressed',m==='rank');
   document.getElementById('mLim').setAttribute('aria-pressed',m==='lim');
   document.getElementById('mKarta').setAttribute('aria-pressed',m==='karta');
