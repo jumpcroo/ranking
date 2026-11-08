@@ -895,9 +895,9 @@ function overallAll(comp){
 function overallAllBlock(aid,comp){
   const a=overallAll(comp).get(aid);if(!a)return '';
   const g=a.grp,r1=x=>fmt(Math.round(x*10)/10);
-  if(a.rk==null)return '<div class="dOv"><div class="t">Overall všech disciplín</div><div class="s">Do overallu se počítají závodníci s aspoň '+OV_MIN+' starty, tady '+cz(a.st.length,'byl jen','byly jen','bylo jen')+' '+a.st.length+'.</div></div>';
+  if(a.rk==null)return '<div class="dOv"><div class="t">Overall – 5 nejlepších startů</div><div class="s">Do overallu se počítají závodníci s aspoň '+OV_MIN+' starty, tady '+cz(a.st.length,'byl jen','byly jen','bylo jen')+' '+a.st.length+'.</div></div>';
   if(g.length<2)return '';
-  let h='<div class="dOv"><div class="dOvTop"><div><div class="t">Overall všech disciplín</div>'+
+  let h='<div class="dOv"><div class="dOvTop"><div><div class="t">Overall – 5 nejlepších startů</div>'+
     '<div class="s">'+catLabelLvl(a.cat)+(a.gen?' · '+genLabel(a.gen):'')+' · individuální i týmové disciplíny · hodnotí se '+OV_K+' nejlepších startů · '+g.length+' '+cz(g.length,'závodník','závodníci','závodníků')+' s aspoň '+OV_MIN+' starty</div></div>'+
     '<div class="big">'+(a.rk<=3?MED[a.rk]+' ':'')+'<b>'+a.rk+'.</b><span> z '+g.length+'</span></div></div><div class="dList">';
   [...a.st].sort((x,y)=>discOrd(x.r.disc)-discOrd(y.r.disc)).forEach(s=>{const f=fieldOf(s.r),inn=a.topIdx.has(s);
