@@ -136,6 +136,7 @@ header{position:sticky;top:0;z-index:30;background:var(--navy);color:#fff;box-sh
 .chartcard .ct .dn{font-family:Poppins;font-weight:600;font-size:15px}
 .chartcard .ct .st{font-size:12px;color:var(--muted);margin-left:auto}
 .chartcard svg{width:100%;height:auto;display:block;overflow:visible}
+.chartcard svg.lc{max-width:540px;margin:0 auto 4px}
 .ptlab{font:600 11px Inter,sans-serif;fill:var(--ink)}
 .xlab{font:500 10px Inter,sans-serif;fill:var(--muted)}
 :focus-visible{outline:2px solid var(--navy);outline-offset:2px}
@@ -542,7 +543,7 @@ function lineChart(series,lims){
     g+=`<text class="ptlab" x="${px.toFixed(1)}" y="${(py-8).toFixed(1)}" text-anchor="middle">${fmt(s.score)}</text>`;
     g+=`<text class="xlab" x="${px.toFixed(1)}" y="${H-15}" text-anchor="middle">${esc(shortComp(s.comp))}</text>`;
     g+=`<text class="xlab" x="${px.toFixed(1)}" y="${H-4}" text-anchor="middle" opacity=".75">${s.lc} · ${shortDate(s.date)}</text>`;});
-  return `<svg viewBox="0 0 ${W} ${H}" role="img" preserveAspectRatio="xMidYMid meet">${g}</svg>`;
+  return `<svg class="lc" viewBox="0 0 ${W} ${H}" role="img" preserveAspectRatio="xMidYMid meet">${g}</svg>`;
 }
 function renderKarta(host){
   host.innerHTML='';
