@@ -1,0 +1,33 @@
+{
+  "_comment": [
+    "Nastavení pro build.py. Nic jiného než tento soubor a názvy souborů v data/ se pro novou soutěž měnit nemusí.",
+    "",
+    "levels: úroveň závodu podle názvu soutěže z exportu (CompetitionName).",
+    "  Většinou ji nemusíš psát — stačí přípona v názvu souboru, např. 'S-BEE 2026 A.json'.",
+    "  Použij tohle, jen když soubor přejmenovat nechceš.",
+    "",
+    "mixedRules: pro soutěže, kde se jede A i B zároveň. Z exportu to vyčíst nejde,",
+    "  ve stejném eventu jsou vedle sebe záznamy obou úrovní. Dvě možnosti:",
+    "    byDivision  – když má export pole DivisionName a dělí se podle něj",
+    "    byAgeGroup  – když jsou úrovně rozdělené podle věkových kategorií",
+    "  Pozor: pokud je stejná kategorie v A i v B (u S-BEE je tam 12–15 v obou),",
+    "  byAgeGroup nestačí a je potřeba byDivision.",
+    "",
+    "clubAliases: sjednocení různých zápisů téhož oddílu.",
+    "",
+    "Limity, názvy disciplín a seznam týmových disciplín žijí v data/legacy.json.",
+    "Když svaz změní kvalifikační limity, mění se tam."
+  ],
+
+  "levels": {},
+
+  "mixedRules": {},
+
+  "clubAliases": {
+    "ALCEDO VSETÍN": "Alcedo Vsetín",
+    "ALCEDO": "Alcedo Vsetín",
+    "Astra Klanovice": "Astra Klánovice",
+    "SKIPPIES LIBEREC": "Skippies Liberec",
+    "DDM PORUBA": "DDM Ostrava-Poruba"
+  }
+}

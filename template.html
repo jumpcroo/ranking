@@ -1,0 +1,508 @@
+<!doctype html><html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Jumpcroo Výsledky</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap">
+<style>
+:root{
+  --navy:#1C3981;--navy-d:#152C63;--navy-tint:#E8ECF6;
+  --ground:#F4F6FB;--surface:#FFFFFF;--surface-2:#F7F9FC;
+  --ink:#1B2436;--muted:#64708A;--line:#E2E7F0;
+  --ok:#1F9D63;--ok-bg:#E6F5EE;--warn:#C98A00;--warn-bg:#FBF1D9;--bad:#C0392B;--bad-bg:#FBE8E5;
+  --chip:#EEF1F8;--chip-on:#1C3981;--shadow:0 1px 2px rgba(20,40,90,.06),0 6px 20px rgba(20,40,90,.06);--radius:14px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --navy:#5B7FD6;--navy-d:#31518f;--navy-tint:#1a2540;--ground:#0E1320;--surface:#161C2B;--surface-2:#1B2233;
+  --ink:#E7ECF6;--muted:#94A0B8;--line:#28324A;--ok:#4FD196;--ok-bg:#123227;--warn:#F0C15A;--warn-bg:#332913;--bad:#F0857A;--bad-bg:#3a1c1a;
+  --chip:#232C42;--chip-on:#5B7FD6;--shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.32);}}
+:root[data-theme="dark"]{
+  --navy:#5B7FD6;--navy-d:#31518f;--navy-tint:#1a2540;--ground:#0E1320;--surface:#161C2B;--surface-2:#1B2233;
+  --ink:#E7ECF6;--muted:#94A0B8;--line:#28324A;--ok:#4FD196;--ok-bg:#123227;--warn:#F0C15A;--warn-bg:#332913;--bad:#F0857A;--bad-bg:#3a1c1a;
+  --chip:#232C42;--chip-on:#5B7FD6;--shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.32);}
+*{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:15px;line-height:1.45;-webkit-text-size-adjust:100%}
+h1,h2,h3{font-family:Poppins,Inter,sans-serif;margin:0;text-wrap:balance}
+.tnum{font-variant-numeric:tabular-nums}
+button{font:inherit;color:inherit;cursor:pointer}
+.wrap{max-width:1120px;margin:0 auto;padding:0 12px 60px}
+header{position:sticky;top:0;z-index:30;background:var(--navy);color:#fff;box-shadow:0 2px 14px rgba(20,40,90,.18)}
+.hbar{max-width:1120px;margin:0 auto;padding:10px 12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:9px;font-family:Poppins;font-weight:700;font-size:17px}
+.dot{width:26px;height:26px;border-radius:50%;background:#fff;color:var(--navy);display:grid;place-items:center;font-family:Poppins;font-weight:700;font-size:12px;flex:none}
+.modeToggle{margin:0 auto;display:flex;background:rgba(255,255,255,.15);border-radius:999px;padding:3px;gap:2px}
+.modeToggle button{border:0;background:transparent;color:#fff;padding:8px 15px;border-radius:999px;font-weight:600;font-size:13.5px;min-height:38px}
+.modeToggle button[aria-pressed="true"]{background:#fff;color:var(--navy)}
+.controls{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:12px;margin-top:12px}
+.search{display:flex;align-items:center;gap:8px;background:var(--surface-2);border:1px solid var(--line);border-radius:11px;padding:10px 12px}
+.search input{border:0;background:transparent;color:inherit;width:100%;font-size:16px;outline:none}
+.search svg{flex:none;color:var(--muted)}
+.rowbtns{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.pillbtn{border:1px solid var(--line);background:var(--surface-2);border-radius:999px;padding:8px 13px;font-size:13px;font-weight:600;color:var(--muted);min-height:38px;display:inline-flex;align-items:center;gap:6px}
+.pillbtn.on{background:var(--chip-on);border-color:var(--chip-on);color:#fff}
+.modeOpts{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.seg{display:inline-flex;background:var(--chip);border-radius:10px;padding:3px;gap:2px}
+.seg button{border:0;background:transparent;padding:7px 12px;border-radius:8px;font-size:13px;font-weight:600;color:var(--muted);min-height:34px}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--navy);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.lbl{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--muted)}
+.drawer{margin-top:10px;display:none;flex-direction:column;gap:14px;border-top:1px dashed var(--line);padding-top:12px}
+.drawer.open{display:flex}
+.fgroup .lbl{margin-bottom:7px;display:block}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{border:1px solid var(--line);background:var(--surface-2);border-radius:999px;padding:7px 12px;font-size:13px;color:var(--ink);min-height:34px;display:inline-flex;align-items:center;gap:6px;user-select:none}
+.chip.on{background:var(--navy);border-color:var(--navy);color:#fff}
+.chip .x{opacity:.7;font-weight:700}
+.clearall{align-self:flex-start;color:var(--navy);background:none;border:0;font-weight:600;font-size:13px;padding:4px 0;text-decoration:underline}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:14px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow)}
+.tile .n{font-family:Poppins;font-weight:700;font-size:24px;line-height:1.1}
+.tile .t{font-size:12px;color:var(--muted);margin-top:2px}
+.tile.ok .n{color:var(--ok)}.tile.warn .n{color:var(--warn)}.tile.bad .n{color:var(--bad)}
+.count{margin:16px 2px 8px;font-size:13px;color:var(--muted)}.count b{color:var(--ink)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin:2px 2px 4px;align-items:center}
+.legend .k{display:inline-flex;align-items:center;gap:6px}
+.legend .sw{width:14px;height:14px;border-radius:5px;display:inline-block}
+.section{margin-top:24px}.section:first-of-type{margin-top:8px}
+.sechead{display:flex;align-items:center;gap:8px;margin:0 2px 10px;flex-wrap:wrap}
+.secname{font-family:Poppins;font-weight:700;font-size:16px;color:var(--ink)}
+.seccount{margin-left:auto;font-size:12px;color:var(--muted)}
+.showall{display:block;margin:10px auto 0;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:9px 18px;font-weight:600;color:var(--navy);font-size:13.5px}
+.cards{display:grid;grid-template-columns:1fr;gap:10px}
+@media(min-width:720px){.cards{grid-template-columns:1fr 1fr}}
+@media(min-width:1000px){.cards{grid-template-columns:1fr 1fr 1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:13px 14px;display:flex;flex-direction:column;gap:9px}
+.card .top{display:flex;align-items:flex-start;gap:10px}
+.rankno{font-family:Poppins;font-weight:700;font-size:15px;color:#fff;background:var(--navy);min-width:30px;height:30px;padding:0 7px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.rankno.pgo{background:var(--ok)}.rankno.pot{background:#FFD43B;color:#4a3600}
+.who{min-width:0;flex:1}
+.who .nm{font-family:Poppins;font-weight:600;font-size:15.5px;line-height:1.2;overflow-wrap:anywhere}
+.who .sub{font-size:12.5px;color:var(--muted);margin-top:2px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.club{display:inline-flex;align-items:center;gap:5px}
+.club.jc{color:var(--navy);font-weight:600}
+.tag{font-size:11px;font-weight:700;padding:2px 7px;border-radius:999px;background:var(--navy-tint);color:var(--navy)}
+.metric{margin-left:auto;text-align:right;flex:none}
+.metric .v{font-family:Poppins;font-weight:700;font-size:20px;line-height:1}
+.metric .k{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+.discline{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px}
+.badge{font-size:11px;font-weight:600;padding:3px 8px;border-radius:999px;background:var(--navy-tint);color:var(--navy)}
+.badge.cat{background:var(--chip);color:var(--muted)}
+.status{font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;display:inline-flex;align-items:center;gap:5px}
+.status.ok{background:var(--ok-bg);color:var(--ok)}.status.warn{background:var(--warn-bg);color:var(--warn)}.status.bad{background:var(--bad-bg);color:var(--bad)}.status.none{background:var(--chip);color:var(--muted)}
+.detail{border-top:1px dashed var(--line);padding-top:9px;display:flex;flex-direction:column;gap:8px}
+.res{display:flex;justify-content:space-between;gap:10px;font-size:12.5px}
+.res .rc{color:var(--muted);overflow-wrap:anywhere}
+.res .rs{font-weight:700;white-space:nowrap}
+.res.best .rs{color:var(--navy)}
+.perf{display:flex;flex-direction:column;gap:2px}
+.roster{font-size:11.5px;color:var(--muted);overflow-wrap:anywhere;line-height:1.4}
+.roster .jcname{color:var(--navy);font-weight:600}
+.lvltag{font-size:10px;font-weight:700;padding:1px 5px;border-radius:5px;background:var(--chip);color:var(--muted)}
+.lim{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:12.5px;color:var(--muted)}.lim b{color:var(--ink)}
+.bar{height:6px;border-radius:999px;background:var(--chip);overflow:hidden;margin-top:2px}
+.bar>i{display:block;height:100%;border-radius:999px;background:var(--navy)}
+.bar>i.ok{background:var(--ok)}.bar>i.warn{background:var(--warn)}.bar>i.bad{background:var(--bad)}
+.empty{text-align:center;color:var(--muted);padding:50px 20px}
+.more{display:block;margin:16px auto 0;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:11px 20px;font-weight:600;color:var(--navy)}
+.filterbar{display:flex;gap:8px;align-items:stretch}
+.filterbar .search{flex:1}
+.fbtn{display:inline-flex;align-items:center;gap:7px;background:var(--navy);color:#fff;border:0;border-radius:11px;padding:0 16px;font-weight:600;font-size:14px;min-height:44px;white-space:nowrap;transition:background .12s}
+.fbtn:hover{background:var(--navy-d)}
+.fcount{background:#fff;color:var(--navy);border-radius:999px;font-size:12px;font-weight:700;min-width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;padding:0 6px}
+.chip{transition:border-color .12s,color .12s,background .12s}
+.chip:hover{border-color:var(--navy);color:var(--navy)}
+.chip.on,.chip.on:hover{background:var(--navy);border-color:var(--navy);color:#fff}
+.modal{position:fixed;inset:0;z-index:50;background:rgba(15,20,32,.45);display:flex;align-items:flex-end;justify-content:center}
+.modalPanel{background:var(--surface);width:100%;max-width:560px;max-height:94vh;display:flex;flex-direction:column;border-radius:18px 18px 0 0;box-shadow:0 -8px 40px rgba(0,0,0,.28);overflow:hidden}
+@media(min-width:641px){.modal{align-items:center}.modalPanel{border-radius:18px;max-height:86vh}}
+.modalHead{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--line);font-family:Poppins;font-weight:700;font-size:18px}
+.iconbtn{border:0;background:var(--chip);width:34px;height:34px;border-radius:50%;font-size:15px;color:var(--ink);display:grid;place-items:center}
+.modalBody{overflow-y:auto;padding:16px 18px;display:flex;flex-direction:column;gap:18px;-webkit-overflow-scrolling:touch}
+.modalBody .chip{min-height:40px;font-size:13.5px}
+.modalFoot{display:flex;gap:10px;padding:14px 18px;border-top:1px solid var(--line);background:var(--surface)}
+.fclear{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:11px;padding:0 16px;min-height:48px;font-weight:600;color:var(--muted)}
+.fapply{flex:1;border:0;background:var(--navy);color:#fff;border-radius:11px;min-height:48px;font-weight:700;font-size:15px;transition:background .12s}
+.fapply:hover{background:var(--navy-d)}
+.matchlist{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.matchrow{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow);text-align:left;width:100%}
+.matchrow .nm{font-family:Poppins;font-weight:600}
+.matchrow .meta{font-size:12.5px;color:var(--muted);margin-top:2px}
+.matchrow .arr{margin-left:auto;color:var(--muted)}
+.khint{text-align:center;color:var(--muted);padding:40px 20px}
+.profhead{background:var(--navy);color:#fff;border-radius:var(--radius);padding:16px 16px;margin-top:12px;box-shadow:var(--shadow)}
+.profhead .nm{font-family:Poppins;font-weight:700;font-size:22px}
+.profhead .meta{opacity:.9;font-size:13.5px;margin-top:3px;display:flex;gap:8px;flex-wrap:wrap}
+.backbtn{background:var(--surface);border:1px solid var(--line);color:var(--navy);border-radius:9px;padding:8px 14px;font-weight:600;font-size:13px;margin:2px 0 4px}
+.chartcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;margin-top:12px}
+.chartcard .ct{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.chartcard .ct .dn{font-family:Poppins;font-weight:600;font-size:15px}
+.chartcard .ct .st{font-size:12px;color:var(--muted);margin-left:auto}
+.chartcard svg{width:100%;height:auto;display:block;overflow:visible}
+.ptlab{font:600 11px Inter,sans-serif;fill:var(--ink)}
+.xlab{font:500 10px Inter,sans-serif;fill:var(--muted)}
+:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
+.winnote{margin:0 0 12px;padding:9px 12px;background:var(--navy-tint);color:var(--navy);border-radius:10px;font-size:12px;line-height:1.5;font-weight:500}
+.winnote b{font-weight:700}
+.profnote{margin:0 0 12px;padding:9px 12px;background:var(--surface-2);color:var(--muted);border:1px solid var(--line);border-radius:10px;font-size:11.5px;line-height:1.5}
+</style></head><body>
+
+<header><div class="hbar">
+  <div class="modeToggle" role="tablist"><button id="mRank" aria-pressed="true">Ranking</button><button id="mLim" aria-pressed="false">Limity</button><button id="mKarta" aria-pressed="false">Karta</button></div>
+</div></header>
+
+<div class="wrap">
+  <div class="controls">
+    <div class="filterbar">
+      <div class="search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="q" type="search" placeholder="Hledat závodníka nebo tým…" autocomplete="off">
+      </div>
+      <button class="fbtn" id="filtBtn" aria-haspopup="dialog">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg>
+        Filtr <span id="filtCount" class="fcount" hidden>0</span>
+      </button>
+    </div>
+    <div class="modeOpts" id="rankOpts">
+      <span class="lbl">Ranking z</span>
+      <div class="seg"><button data-rs="all" aria-pressed="true">Všechny soutěže</button><button data-rs="A" aria-pressed="false">Jen áčka (nominace)</button></div>
+    </div>
+    <div class="modeOpts" id="limOpts" hidden>
+      <span class="lbl">Kvalifikace na</span>
+      <div class="seg"><button data-t="ms" aria-pressed="true">MS / ME</button><button data-t="mcr" aria-pressed="false">MČR</button></div>
+      <div class="seg"><button data-s="all" aria-pressed="true">Vše</button><button data-s="ok" aria-pressed="false">Splněno</button><button data-s="miss" aria-pressed="false">Nesplněno</button></div>
+    </div>
+  </div>
+
+  <div class="modal" id="filterModal" hidden>
+    <div class="modalPanel" role="dialog" aria-label="Filtr">
+      <div class="modalHead"><span>Filtr</span><button class="iconbtn" id="fClose" aria-label="Zavřít">✕</button></div>
+      <div class="modalBody">
+        <div class="fgroup"><span class="lbl">Kategorie</span><div class="chips" id="fCat"></div></div>
+        <div class="fgroup"><span class="lbl">Gender</span><div class="chips" id="fGen"></div></div>
+        <div class="fgroup"><span class="lbl">Disciplíny</span><div class="chips" id="fDisc"></div></div>
+        <div class="fgroup"><span class="lbl">Týmy</span><div class="chips" id="fTeam"></div></div>
+        <div class="fgroup"><span class="lbl">Soutěže</span><div class="chips" id="fComp"></div></div>
+      </div>
+      <div class="modalFoot"><button class="fclear" id="clearBtn">Zrušit vše</button><button class="fapply" id="fApply">Zobrazit výsledky</button></div>
+    </div>
+  </div>
+  <div class="winnote" id="winNote" hidden></div>
+  <div class="tiles" id="tiles"></div>
+  <div class="count" id="count"></div>
+  <div class="legend" id="legend" hidden>
+    <span class="k"><span class="sw" style="background:var(--ok)"></span> 1.–3. místo — postup MS/ME</span>
+    <span class="k"><span class="sw" style="background:#FFD43B"></span> 4.–5. místo — OT</span>
+  </div>
+  <div id="cards"></div>
+  <button class="more" id="moreBtn" hidden>Zobrazit další</button>
+  <div class="foot" id="foot" style="margin-top:22px;font-size:11.5px;color:var(--muted);text-align:center;line-height:1.6"></div>
+</div>
+
+<script id="DATA" type="application/json">__DATA__</script>
+<script>
+const DATA=JSON.parse(document.getElementById('DATA').textContent);
+const P=DATA.perfs, LIM=DATA.limits, DN=DATA.discNames, TEAM=new Set(DATA.teamDisc), ATH=DATA.athCat||{};
+const DISC_ORDER=["SRSS","SRSE","SRTU","SRSR","SRDR","DDSS","DDSR","DDCS","SRIF","SRPF","SRTF","DDSF","DDPF","WHPF","SCTF","LREJ","AMJRFOCR","AMJRF-DDDU1X60"];
+const CAT_ORDER=['U8','U11','J','S','?'];
+const CATLAB={U8:'8 a mladší',U11:'11 a mladší',J:'12–15',S:'16+','?':'nejasná kat.'};
+const catLabelLvl=l=>l===0?'8 a mladší':l===1?'11 a mladší':l===2?'12–15':l===3?'16+':'nejasná kat.';
+const dispCatsFor=l=>l===0?['U8','U11']:l===1?['U11']:l===2?['J']:l===3?['S']:['?'];
+const genLabel=g=>g==='Female'?'Ženy':g==='Male'?'Muži':g==='Mixed'?'Mix':'—';
+const fmt=n=>(Math.round(n*100)/100).toString().replace('.',',');
+const dcName=d=>DN[d]||d;
+const esc=s=>(s+'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const shortComp=n=>n.replace('Mistrovství České republiky','MČR').replace(' Competition','').replace(' 2026','').replace('Between Speed Open','Between').replace('Czech Jump Rope Open','Czech Open');
+
+const state={mode:'rank',q:'',target:'ms',limShow:'all',rankScope:'all',selAid:null,
+  cat:new Set(),gen:new Set(),disc:new Set(),team:new Set(),comp:new Set()};
+const COMP_PREF=["Master Cup 2026","S-Bee Games 2026","Skippy Cup 2026","Mamut Cup 2026","Rebelstyle Competition 2026","Maky Cup 2026","Between Speed Open","Mistrovství České republiky 2026","Mini Cup 2026","ME","EOT","JME","Czech Jump Rope Open 2026"];
+const COMP_ORDER=COMP_PREF.concat([...new Set(P.map(r=>r.comp))].filter(c=>c&&!COMP_PREF.includes(c)).sort((a,b)=>a.localeCompare(b,"cs")));
+const GRP=DATA.compGroups||{A:[],mixed:[],B:[],intl:[]};
+/* Rozhodné období: 10 celých kalendářních měsíců zpět + běžící měsíc.
+   Počítá se z data otevření stránky, takže se posouvá samo. */
+const WIN_MONTHS=10;
+function winFrom(){const n=new Date();const d=new Date(n.getFullYear(),n.getMonth()-WIN_MONTHS,1);
+  const z=x=>String(x).padStart(2,"0");return d.getFullYear()+"-"+z(d.getMonth()+1)+"-"+z(d.getDate());}
+const WIN_FROM=winFrom();
+const czDate=d=>d?(+d.slice(8,10))+". "+(+d.slice(5,7))+". "+d.slice(0,4):"";
+const shortDate=d=>d?(+d.slice(8,10))+"."+(+d.slice(5,7))+".":"";
+const teamsAll=[...new Set(P.filter(r=>r.club).map(r=>r.club))].sort((a,b)=>a.localeCompare(b,'cs'));
+const discs=[...new Set(P.map(r=>r.disc))].sort((a,b)=>((DISC_ORDER.indexOf(a)+1||99)-(DISC_ORDER.indexOf(b)+1||99)));
+
+function chip(id,items,set){const el=document.getElementById(id);if(!el)return;el.innerHTML='';items.forEach(it=>{const b=document.createElement('button');b.className='chip'+(set.has(it.v)?' on':'');b.innerHTML=it.label+(set.has(it.v)?' <span class="x">×</span>':'');b.onclick=()=>{set.has(it.v)?set.delete(it.v):set.add(it.v);buildFilters();render();};el.appendChild(b);});}
+function compChips(id,list){chip(id,(list||[]).filter(c=>c).map(c=>({v:c,label:shortComp(c)})),state.comp);}
+function buildFilters(){
+  chip('fCat',[{v:'U8',label:'8 a mladší'},{v:'U11',label:'11 a mladší'},{v:'J',label:'12–15'},{v:'S',label:'16+'}],state.cat);
+  chip('fGen',[{v:'Female',label:'Ženy'},{v:'Male',label:'Muži'},{v:'Mixed',label:'Mix'}],state.gen);
+  chip('fDisc',discs.map(d=>({v:d,label:d})),state.disc);
+  chip('fTeam',teamsAll.map(t=>({v:t,label:t})),state.team);
+  const present=new Set(P.map(r=>r.comp));
+  chip('fComp',COMP_ORDER.filter(c=>present.has(c)).map(c=>({v:c,label:shortComp(c)})),state.comp);
+}
+const activeFilterCount=()=>state.cat.size+state.gen.size+state.disc.size+state.team.size+state.comp.size;
+
+function pool(){
+  let p=P.filter(r=>state.mode==='rank'?(state.rankScope==='A'?r.cR:r.cL):r.cL);
+  p=p.filter(r=>!r.date||r.date>=WIN_FROM);
+  if(state.gen.size)p=p.filter(r=>state.gen.has(r.gender));
+  if(state.disc.size)p=p.filter(r=>state.disc.has(r.disc));
+  if(state.team.size)p=p.filter(r=>r.club&&state.team.has(r.club));
+  if(state.comp.size)p=p.filter(r=>state.comp.has(r.comp));
+  return p;
+}
+function bestGender(gs){const f=gs.includes('Female'),m=gs.includes('Male');return f&&!m?'Female':m&&!f?'Male':(gs.includes('Mixed')?'Mixed':(gs.find(x=>x)||null));}
+function bestClub(cl){const real=cl.filter(c=>c&&c!=='Reprezentace ČR');const pool=real.length?real:cl.filter(c=>c);if(!pool.length)return null;const m={};pool.forEach(c=>m[c]=(m[c]||0)+1);return Object.keys(m).sort((a,b)=>m[b]-m[a])[0];}
+function alvl(a){const v=ATH[a];return (v===0||v)?v:null;}
+function entities(p){
+  const ind=new Map(),team=new Map();
+  for(const r of p){
+    if(r.kind==='team'){
+      const sig=r.members.map(m=>m.aid).slice().sort().join('+');
+      const k=sig+'|'+r.disc;
+      let o=team.get(k);if(!o){o={kind:'team',disc:r.disc,recs:[],_g:[],_al:[],_cl:[],members:r.members};team.set(k,o);}
+      o.recs.push(r);o._g.push(r.gender);o._al.push(r.al);o._cl.push(r.club);
+      if(r.members.length>o.members.length)o.members=r.members;
+    }else{
+      const a=r.members[0];const k=a.aid+'|'+r.disc;
+      let o=ind.get(k);if(!o){o={kind:'ind',aid:a.aid,ath:a.name,disc:r.disc,recs:[],_g:[],_al:[],_cl:[]};ind.set(k,o);}
+      o.recs.push(r);o._g.push(r.gender);o._al.push(r.al);o._cl.push(r.club);
+    }
+  }
+  const fin=[...ind.values(),...team.values()];
+  fin.forEach(o=>{
+    o.gender=bestGender(o._g);o.club=bestClub(o._cl);
+    if(o.kind==='ind'){o.lvl=alvl(o.aid);}
+    else{const ml=o.members.map(m=>alvl(m.aid)).filter(v=>v!=null);
+      if(ml.length)o.lvl=Math.max(...ml);
+      else{const al=o._al.filter(v=>v!=null);o.lvl=al.length?Math.min(...al):null;}}
+    o.dispCats=dispCatsFor(o.lvl);
+    o.limCat=o.lvl===2?'junior':o.lvl===3?'senior':null;
+  });
+  return fin;
+}
+const topTwo=recs=>[...recs].sort((a,b)=>b.score-a.score||(b.date||'').localeCompare(a.date||'')).slice(0,2);
+function limitFor(disc,cat,target){const L=LIM[disc];if(!L)return null;
+  /* Limit MČR je zároveň maximální limit úrovně B – platí pro každou věkovou
+     kategorii, i pro 11 a mladší. Kdo ho dosáhne, nesmí už v té disciplíně
+     startovat na B. Limity na MS mají jen junior (12–15) a senior (16+). */
+  if(target==='mcr')return L.mcr!=null?L.mcr:null;
+  if(cat==='junior')return L.junior_ms;if(cat==='senior')return L.senior_ms;return null;}
+function matchQ(o){if(!state.q)return true;if(o.kind==='ind')return (o.ath||'').toLowerCase().includes(state.q);return (o.club||'').toLowerCase().includes(state.q)||o.recs.some(r=>r.members.some(m=>(m.name||'').toLowerCase().includes(state.q)));}
+
+function render(){
+  const host=document.getElementById('cards');host.innerHTML='';
+  const tiles=document.getElementById('tiles');
+  document.getElementById('moreBtn').hidden=true;
+  document.getElementById('legend').hidden=state.mode!=='rank';
+  document.getElementById('rankOpts').hidden=state.mode!=='rank';
+  document.getElementById('limOpts').hidden=state.mode!=='lim';
+  const wn=document.getElementById('winNote');
+  if(wn){wn.hidden=state.mode==='karta';
+    wn.innerHTML='Rozhodné období: <b>od '+czDate(WIN_FROM)+'</b> — 10 celých kalendářních měsíců zpět plus běžící měsíc. '
+      +'Starší výsledky se do '+(state.mode==='rank'?'rankingu':'limitů')+' nepočítají; celou historii najdeš na Kartě.';}
+  if(state.mode==='karta'){tiles.innerHTML='';document.getElementById('count').innerHTML='';const fc=activeFilterCount();const bd=document.getElementById('filtCount');bd.hidden=!fc;bd.textContent=fc;renderKarta(host);return;}
+  const p=pool();
+  const all=entities(p).filter(o=>o.lvl!=null);
+  let showCount=0;
+  const catSel=state.cat.size?state.cat:null;
+  if(state.mode==='rank'){
+    all.forEach(o=>{o.tt=topTwo(o.recs);o.sum=o.tt.reduce((a,r)=>a+r.score,0);});
+    const buckets={};
+    all.forEach(o=>o.dispCats.forEach(dc=>{if(catSel&&!catSel.has(dc))return;const k=o.disc+'|'+dc+'|'+(o.gender||'');(buckets[k]=buckets[k]||[]).push(o);}));
+    const bucketRk={};
+    Object.entries(buckets).forEach(([k,arr])=>{arr.sort((a,b)=>b.sum-a.sum||((b.tt[0]&&b.tt[0].date)||'').localeCompare((a.tt[0]&&a.tt[0].date)||''));const m=new Map();arr.forEach((o,i)=>m.set(o,i+1));bucketRk[k]=m;});
+    const showB={};let sc=0;
+    Object.entries(buckets).forEach(([k,arr])=>{const f=arr.filter(matchQ);if(f.length){showB[k]=f;sc+=f.length;}});
+    showCount=sc;
+    tiles.innerHTML='';
+    addTile(tiles,'',all.length,'záznamů');
+    addTile(tiles,'',new Set(p.map(r=>r.kind==='ind'?r.members[0].aid:r.club)).size,'závodníků / týmů');
+    addTile(tiles,'',new Set(p.map(r=>r.comp)).size,'soutěží');
+    renderSections(showB,bucketRk,host);
+    document.getElementById('count').innerHTML='<b>'+sc+'</b> '+(state.q?'nalezeno — umístění dle filtrů':'položek v pořadí');
+  }else{
+    all.forEach(o=>{const s=[...o.recs].sort((a,b)=>b.score-a.score);o.best=s[0]?s[0].score:0;o.bestRec=s[0];o.sum=s.slice(0,2).reduce((a,r)=>a+r.score,0);o.limit=limitFor(o.disc,o.limCat,state.target);o.status=o.limit==null?'none':(o.best>=o.limit?'ok':(o.best>=o.limit*0.95?'warn':'bad'));});
+    let base=catSel?all.filter(o=>o.dispCats.some(dc=>catSel.has(dc))):all;
+    const wl=base.filter(o=>o.limit!=null);
+    tiles.innerHTML='';
+    addTile(tiles,'ok',wl.filter(o=>o.status==='ok').length,'splňuje limit');
+    addTile(tiles,'warn',wl.filter(o=>o.status==='warn').length,'těsně pod (≥95 %)');
+    addTile(tiles,'bad',wl.filter(o=>o.status==='bad').length,'nesplňuje');
+    let show=base.slice();
+    if(state.limShow==='ok')show=show.filter(o=>o.status==='ok');
+    if(state.limShow==='miss')show=show.filter(o=>o.status==='bad'||o.status==='warn');
+    show=show.filter(matchQ);
+    const rk={ok:0,warn:1,bad:2,none:3};
+    show.sort((a,b)=>rk[a.status]-rk[b.status]||((b.limit?b.best/b.limit:0)-(a.limit?a.best/a.limit:0)));
+    showCount=show.length;
+    renderFlat(show,host,renderLimCard);
+    document.getElementById('count').innerHTML='<b>'+show.length+'</b> položek';
+  }
+  const fc=activeFilterCount();const badge=document.getElementById('filtCount');badge.hidden=!fc;badge.textContent=fc;
+  const ap=document.getElementById('fApply');if(ap)ap.textContent='Zobrazit výsledky ('+showCount+')';
+}
+
+function addTile(c,cls,n,t){const d=document.createElement('div');d.className='tile'+(cls?' '+cls:'');d.innerHTML='<div class="n tnum">'+n+'</div><div class="t">'+t+'</div>';c.appendChild(d);}
+
+function renderSections(buckets,bucketRk,host){
+  const keys=Object.keys(buckets).sort((a,b)=>{const A=a.split('|'),B=b.split('|');
+    const di=(DISC_ORDER.indexOf(A[0])+1||99)-(DISC_ORDER.indexOf(B[0])+1||99);if(di)return di;
+    const ci=CAT_ORDER.indexOf(A[1])-CAT_ORDER.indexOf(B[1]);if(ci)return ci;
+    const gr={Female:0,Male:1,Mixed:2,'':3};return(gr[A[2]]??4)-(gr[B[2]]??4);});
+  if(!keys.length){host.innerHTML='<div class="empty">Žádné výsledky pro zvolené filtry.</div>';return;}
+  for(const k of keys){
+    const rkm=bucketRk[k];
+    const arr=buckets[k].slice().sort((a,b)=>rkm.get(a)-rkm.get(b));const [d,dc,gen]=k.split('|');
+    const sec=document.createElement('div');sec.className='section';
+    const h=document.createElement('div');h.className='sechead';
+    h.innerHTML='<span class="secname">'+esc(dcName(d))+'</span><span class="badge cat">'+CATLAB[dc]+'</span><span class="badge cat">'+(genLabel(gen)||'—')+'</span>'+(TEAM.has(d)?'<span class="tag">týmové</span>':'')+'<span class="seccount">'+arr.length+'</span>';
+    sec.appendChild(h);
+    const grid=document.createElement('div');grid.className='cards';
+    arr.slice(0,6).forEach(o=>grid.appendChild(renderRankCard(o,rkm.get(o))));
+    sec.appendChild(grid);
+    if(arr.length>6){const btn=document.createElement('button');btn.className='showall';btn.textContent='Zobrazit vše ('+arr.length+')';let open=false;
+      btn.onclick=()=>{if(open){[...grid.children].slice(6).forEach(c=>c.remove());btn.textContent='Zobrazit vše ('+arr.length+')';open=false;}else{arr.slice(6).forEach(o=>grid.appendChild(renderRankCard(o,rkm.get(o))));btn.textContent='Skrýt';open=true;}};
+      sec.appendChild(btn);}
+    host.appendChild(sec);
+  }
+}
+function renderFlat(es,host,fn){
+  if(!es.length){host.innerHTML='<div class="empty">Žádné výsledky pro zvolené filtry.</div>';document.getElementById('moreBtn').hidden=true;return;}
+  const grid=document.createElement('div');grid.className='cards';host.appendChild(grid);
+  let shown=0;const step=60;
+  const more=()=>{const end=Math.min(shown+step,es.length);for(let i=shown;i<end;i++)grid.appendChild(fn(es[i]));shown=end;document.getElementById('moreBtn').hidden=shown>=es.length;};
+  const mb=document.getElementById('moreBtn');mb.onclick=more;more();
+}
+function roster(rec){return rec.members.map(m=>'<span class="'+(rec.club==='Jumpcroo'?'jcname':'')+'">'+esc(m.name)+'</span>').join(', ');}
+
+function renderRankCard(o,rk){
+  const c=document.createElement('div');c.className='card';
+  const cls=rk<=3?'pgo':rk<=5?'pot':'';
+  if(o.kind==='team'){
+    const jc=o.club==='Jumpcroo';
+    const det=o.tt.map(r=>'<div class="perf"><div class="res"><span class="rc">'+esc(shortComp(r.comp))+' <span class="lvltag">'+r.lc+'</span></span><span class="rs tnum">'+fmt(r.score)+'</span></div><div class="roster">'+roster(r)+'</div></div>').join('');
+    c.innerHTML='<div class="top"><span class="rankno '+cls+'">'+rk+'</span><div class="who"><div class="nm">'+(jc?'★ ':'')+esc(o.club||'—')+'</div><div class="sub"><span>'+genLabel(o.gender)+'</span> <span>·</span> <span>'+catLabelLvl(o.lvl)+'</span> <span>·</span> <span>tým</span></div></div><div class="metric"><div class="v tnum">'+fmt(o.sum)+'</div><div class="k">2 nejlepší</div></div></div>'+
+      '<div class="discline"><span class="badge">'+o.disc+'</span> <span style="color:var(--muted);font-size:12.5px">'+esc(dcName(o.disc))+'</span></div><div class="detail">'+det+'</div>';
+    return c;
+  }
+  const jc=o.club==='Jumpcroo';
+  const det=o.tt.map(r=>'<div class="res"><span class="rc">'+esc(shortComp(r.comp))+' <span class="lvltag">'+r.lc+'</span></span><span class="rs tnum">'+fmt(r.score)+'</span></div>').join('');
+  c.innerHTML='<div class="top"><span class="rankno '+cls+'">'+rk+'</span><div class="who"><div class="nm">'+esc(o.ath)+'</div><div class="sub">'+(o.club?'<span class="club'+(jc?' jc':'')+'">'+(jc?'★ ':'')+esc(o.club)+'</span>':'')+' <span>·</span> <span>'+genLabel(o.gender)+'</span> <span>·</span> <span>'+catLabelLvl(o.lvl)+'</span></div></div><div class="metric"><div class="v tnum">'+fmt(o.sum)+'</div><div class="k">2 nejlepší</div></div></div>'+
+    '<div class="discline"><span class="badge">'+o.disc+'</span> <span style="color:var(--muted);font-size:12.5px">'+esc(dcName(o.disc))+'</span></div><div class="detail">'+det+'</div>';
+  return c;
+}
+function renderLimCard(o){
+  const c=document.createElement('div');c.className='card';const st=o.status;
+  const stTxt={ok:'Splněno',warn:'Těsně pod',bad:'Nesplněno',none:'Bez limitu'}[st];
+  const pct=o.limit?Math.min(100,Math.round(o.best/o.limit*100)):0;
+  const title=o.kind==='team'?((o.club==='Jumpcroo'?'★ ':'')+esc(o.club||'—')):esc(o.ath);
+  const sub=o.kind==='team'?(genLabel(o.gender)+' · '+catLabelLvl(o.lvl)+' · tým'):((o.club?((o.club==='Jumpcroo'?'★ ':'')+esc(o.club)+' · '):'')+genLabel(o.gender)+' · '+catLabelLvl(o.lvl));
+  let det='';
+  if(o.bestRec){det='<div class="detail"><div class="perf"><div class="res best"><span class="rc">'+esc(shortComp(o.bestRec.comp))+' <span class="lvltag">'+o.bestRec.lc+'</span></span><span class="rs tnum">'+fmt(o.best)+'</span></div>'+(o.kind==='team'?'<div class="roster">'+roster(o.bestRec)+'</div>':'')+'</div></div>';}
+  c.innerHTML='<div class="top"><div class="who"><div class="nm">'+title+'</div><div class="sub">'+sub+'</div></div><div class="metric"><div class="v tnum">'+fmt(o.best)+'</div><div class="k">nejlepší</div></div></div>'+
+    '<div class="discline"><span class="badge">'+o.disc+'</span><span style="color:var(--muted);font-size:12.5px">'+esc(dcName(o.disc))+'</span><span class="status '+st+'" style="margin-left:auto">'+stTxt+'</span></div>'+
+    (o.limit!=null?('<div class="bar"><i class="'+st+'" style="width:'+pct+'%"></i></div><div class="lim"><span>Limit '+(state.target==='mcr'?'MČR':'MS/ME')+': <b class="tnum">'+fmt(o.limit)+'</b></span><span>2 nejlepší: <b class="tnum">'+fmt(o.sum)+'</b></span></div>'):'<div class="lim"><span>Pro tuto kategorii/disciplínu není limit</span></div>')+det;
+  return c;
+}
+
+let _athidx=null;
+function athIdx(){
+  if(_athidx)return _athidx;
+  const m=new Map();
+  P.forEach(p=>p.members.forEach(mm=>{
+    if(!m.has(mm.aid))m.set(mm.aid,{aid:mm.aid,name:mm.name,_cl:[],_g:[]});
+    const o=m.get(mm.aid);if(p.club)o._cl.push(p.club);if(p.kind==='ind'&&(p.gender==='Female'||p.gender==='Male'))o._g.push(p.gender);
+  }));
+  m.forEach(o=>{o.club=bestClub(o._cl);o.gender=bestGender(o._g);o.lvl=(o.aid in ATH)?ATH[o.aid]:null;});
+  _athidx=[...m.values()];return _athidx;
+}
+function athPerfs(aid,compSet){
+  const byd={};
+  for(const p of P){
+    if(!p.members.some(mm=>mm.aid===aid))continue;
+    if(compSet&&compSet.size&&!compSet.has(p.comp))continue;
+    (byd[p.disc]=byd[p.disc]||[]).push({comp:p.comp,date:p.date||'',score:p.score,lc:p.lc});
+  }
+  for(const d in byd)byd[d].sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  return byd;
+}
+function lineChart(series,lims){
+  const LN=(lims||[]).filter(l=>l&&l.v!=null);
+  const W=320,H=160,pl=10,pr=10,pt=22,pb=38,n=series.length;
+  const xs=n===1?[W/2]:series.map((_,i)=>pl+i*((W-pl-pr)/(n-1)));
+  const vals=series.map(s=>s.score);let mn=Math.min(...vals),mx=Math.max(...vals);
+  LN.forEach(l=>{mn=Math.min(mn,l.v);mx=Math.max(mx,l.v);});
+  if(mn===mx){mn-=1;mx+=1;}else{const padv=(mx-mn)*0.12;mn-=padv;mx+=padv;}
+  const y=v=>pt+(H-pt-pb)*(1-(v-mn)/(mx-mn));
+  const pts=series.map((s,i)=>[xs[i],y(s.score)]);
+  let g='';
+  LN.forEach(l=>{const ly=y(l.v);
+    g+=`<line x1="0" y1="${ly.toFixed(1)}" x2="${W}" y2="${ly.toFixed(1)}" stroke="${l.color}" stroke-width="1.5" stroke-dasharray="5 4" opacity=".85"/>`;
+    const ax=l.anchor==='start'?2:W-2;
+    g+=`<text class="ptlab" x="${ax}" y="${(ly-5).toFixed(1)}" text-anchor="${l.anchor}" fill="${l.color}">${l.label} ${fmt(l.v)}</text>`;});
+  const firstIn=series.findIndex(s=>s.date&&s.date>=WIN_FROM);
+  if(firstIn>0){const bx=(xs[firstIn-1]+xs[firstIn])/2;
+    g+=`<line x1="${bx.toFixed(1)}" y1="${pt-8}" x2="${bx.toFixed(1)}" y2="${H-pb+4}" stroke="var(--line)" stroke-width="1" stroke-dasharray="3 3"/>`;}
+  if(n>1)g+=`<path d="${pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ')}" fill="none" stroke="var(--navy)" stroke-width="2"/>`;
+  series.forEach((s,i)=>{const px=pts[i][0],py=pts[i][1];
+    const inWin=!s.date||s.date>=WIN_FROM;
+    g+=`<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="4" fill="${s.lc==='B'?'var(--surface)':'var(--navy)'}" stroke="var(--navy)" stroke-width="2"${inWin?'':' opacity=".4"'}/>`;
+    g+=`<text class="ptlab" x="${px.toFixed(1)}" y="${(py-8).toFixed(1)}" text-anchor="middle">${fmt(s.score)}</text>`;
+    g+=`<text class="xlab" x="${px.toFixed(1)}" y="${H-15}" text-anchor="middle">${esc(shortComp(s.comp))}</text>`;
+    g+=`<text class="xlab" x="${px.toFixed(1)}" y="${H-4}" text-anchor="middle" opacity=".75">${s.lc} · ${shortDate(s.date)}</text>`;});
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" preserveAspectRatio="xMidYMid meet">${g}</svg>`;
+}
+function renderKarta(host){
+  host.innerHTML='';
+  if(state.selAid){const a=athIdx().find(x=>x.aid===state.selAid);if(a){renderProfile(host,a);return;}state.selAid=null;}
+  const q=state.q;
+  if(!q){host.innerHTML='<div class="khint">Začni psát jméno závodníka nahoře — zobrazí se jeho karta s grafy výkonů po disciplínách.<br>Filtrovat můžeš podle soutěží (ostatní filtry se tu neuplatní).</div>';return;}
+  const matches=athIdx().filter(a=>a.name.toLowerCase().includes(q)).sort((a,b)=>a.name.localeCompare(b.name,'cs'));
+  if(!matches.length){host.innerHTML='<div class="khint">Nikdo nenalezen.</div>';return;}
+  const list=document.createElement('div');list.className='matchlist';
+  matches.slice(0,50).forEach(a=>{const b=document.createElement('button');b.className='matchrow';
+    b.innerHTML='<div><div class="nm">'+(a.club==='Jumpcroo'?'★ ':'')+esc(a.name)+'</div><div class="meta">'+(a.club?esc(a.club)+' · ':'')+genLabel(a.gender)+' · '+catLabelLvl(a.lvl)+'</div></div><span class="arr">›</span>';
+    b.onclick=()=>{state.selAid=a.aid;render();};list.appendChild(b);});
+  host.appendChild(list);
+}
+function renderProfile(host,a){
+  const back=document.createElement('button');back.className='backbtn';back.textContent='‹ Zpět na hledání';back.onclick=()=>{state.selAid=null;render();};host.appendChild(back);
+  const hd=document.createElement('div');hd.className='profhead';
+  hd.innerHTML='<div class="nm">'+(a.club==='Jumpcroo'?'★ ':'')+esc(a.name)+'</div><div class="meta"><span>'+(a.club?esc(a.club):'—')+'</span><span>·</span><span>'+genLabel(a.gender)+'</span><span>·</span><span>'+catLabelLvl(a.lvl)+'</span></div>';
+  host.appendChild(hd);
+  const note=document.createElement('div');note.className='profnote';
+  note.innerHTML='Karta ukazuje <b>všechny výsledky v čase</b>, i starší než rozhodné období. '
+    +'Svislá čárkovaná linka označuje začátek rozhodného období (od '+czDate(WIN_FROM)+'), '
+    +'ztlumené body jsou starší a do rankingu ani limitů se nepočítají. '
+    +'<b>Oranžová</b> vodorovná linka je limit na MČR – ten je zároveň stropem pro soutěže úrovně B: '
+    +'kdo ho v disciplíně dosáhne, už v ní na B startovat nemůže. '
+    +'<b>Zelená</b> linka je limit na MS a kreslí se jen u kategorií 12–15 a 16+.';
+  host.appendChild(note);
+  const byd=athPerfs(a.aid,state.comp);
+  const discs=Object.keys(byd).sort((x,y)=>((DISC_ORDER.indexOf(x)+1||99)-(DISC_ORDER.indexOf(y)+1||99)));
+  if(!discs.length){const e=document.createElement('div');e.className='khint';e.textContent='Pro zvolené soutěže nejsou žádné výsledky.';host.appendChild(e);return;}
+  for(const d of discs){const s=byd[d];const best=Math.max(...s.map(x=>x.score));const two=[...s].sort((x,y)=>y.score-x.score).slice(0,2).reduce((t,x)=>t+x.score,0);
+    const card=document.createElement('div');card.className='chartcard';
+    card.innerHTML='<div class="ct"><span class="dn">'+esc(dcName(d))+'</span><span class="badge">'+d+'</span>'+(TEAM.has(d)?'<span class="tag">tým</span>':'')+'<span class="st">nejlepší '+fmt(best)+' · 2 nejl. '+fmt(two)+'</span></div>'+lineChart(s,(()=>{const lc=a.lvl===2?'junior':a.lvl===3?'senior':null;
+    const out=[{v:limitFor(d,lc,'mcr'),label:'MČR · strop B',color:'var(--warn)',anchor:'start'}];
+    if(lc)out.push({v:limitFor(d,lc,'ms'),label:'MS',color:'var(--ok)',anchor:'end'});
+    return out;})());
+    host.appendChild(card);}
+}
+function setMode(m){state.mode=m;document.getElementById('mRank').setAttribute('aria-pressed',m==='rank');document.getElementById('mLim').setAttribute('aria-pressed',m==='lim');document.getElementById('mKarta').setAttribute('aria-pressed',m==='karta');render();}
+document.getElementById('mRank').onclick=()=>setMode('rank');
+document.getElementById('mLim').onclick=()=>setMode('lim');
+document.getElementById('mKarta').onclick=()=>setMode('karta');
+document.getElementById('q').addEventListener('input',e=>{state.q=e.target.value.trim().toLowerCase();if(state.mode==='karta')state.selAid=null;render();});
+const modal=document.getElementById('filterModal');
+function openModal(){modal.hidden=false;document.body.style.overflow='hidden';}
+function closeModal(){modal.hidden=true;document.body.style.overflow='';}
+document.getElementById('filtBtn').onclick=openModal;
+document.getElementById('fClose').onclick=closeModal;
+document.getElementById('fApply').onclick=closeModal;
+modal.onclick=e=>{if(e.target===modal)closeModal();};
+document.querySelectorAll('#rankOpts .seg button[data-rs]').forEach(b=>b.onclick=()=>{state.rankScope=b.dataset.rs;document.querySelectorAll('#rankOpts .seg button[data-rs]').forEach(x=>x.setAttribute('aria-pressed',x===b));render();});
+document.querySelectorAll('#limOpts .seg button[data-t]').forEach(b=>b.onclick=()=>{state.target=b.dataset.t;document.querySelectorAll('#limOpts .seg button[data-t]').forEach(x=>x.setAttribute('aria-pressed',x===b));render();});
+document.querySelectorAll('#limOpts .seg button[data-s]').forEach(b=>b.onclick=()=>{state.limShow=b.dataset.s;document.querySelectorAll('#limOpts .seg button[data-s]').forEach(x=>x.setAttribute('aria-pressed',x===b));render();});
+document.getElementById('clearBtn').onclick=()=>{['cat','gen','disc','team','comp'].forEach(k=>state[k].clear());buildFilters();render();};
+document.getElementById('foot').innerHTML='Ranking = součet dvou nejlepších (A soutěže + mezinárodní) za rozhodné období, při shodě rozhoduje novější výsledek. Limity = nejlepší výsledek vs. limit, také za rozhodné období. Rozhodné období = 10 celých kalendářních měsíců zpět plus běžící měsíc, tedy od '+czDate(WIN_FROM)+'. Karta ukazuje celou historii bez omezení. Týmové disciplíny: umístění týmu + soupis závodnic. Data generována '+DATA.generated+'.';
+buildFilters();setMode('rank');
+</script>
+</body></html>
