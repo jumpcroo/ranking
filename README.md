@@ -66,6 +66,27 @@ netipuje.
   v pořádku.
 - **Vynechané záznamy** – smazané a neohodnocené položky se do dat neberou.
 
+## Záložky
+
+- **Ranking** – nominační pořadí, součet dvou nejlepších
+- **Limity** – splnění kvalifikačních limitů, přepínač MS/ME × MČR
+- **Karta** – karta závodnice, celá historie a graf posunu po disciplínách
+- **Posun** – podklad na povídání o výsledcích po závodě
+
+### Posun
+
+Vybere se závod a u každé závodnice se ukáže, co zajela a o kolik se posunula
+proti svému poslednímu výkonu v téže disciplíně. Označí se osobní rekord, první
+start v disciplíně a to, když výkon poprvé překročil limit MČR nebo MS. Nahoře
+je souhrn: kolik padlo osobáků, kolik limitů a tři největší zlepšení.
+
+Výchozí oddíl je Jumpcroo; jinak se řídí filtrem týmů. Hledání podle jména
+funguje, takže si každý najde sám sebe.
+
+Rozhodné období se tu **neuplatňuje** – porovnává se s celou historií.
+U týmových disciplín se porovnává s vlastním předchozím výkonem v disciplíně,
+i když mohla být sestava jiná.
+
 ## Jak se počítá ranking a limity
 
 - **Ranking** = součet dvou nejlepších výsledků ze závodů úrovně A a z mezinárodních
