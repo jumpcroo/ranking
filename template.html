@@ -900,7 +900,7 @@ function overallAllBlock(aid,comp){
   if(a.rk==null)return '<div class="dOv"><div class="t">Overall všech disciplín</div><div class="s">Do overallu se počítají závodníci s aspoň '+OV_MIN+' starty, tady '+cz(a.st.length,'byl jen','byly jen','bylo jen')+' '+a.st.length+'.</div></div>';
   if(g.length<2)return '';
   let h='<div class="dOv"><div class="dOvTop"><div><div class="t">Overall všech disciplín</div>'+
-    '<div class="s">'+catLabelLvl(a.cat)+(a.gen?' · '+genLabel(a.gen):'')+' · individuální i týmové disciplíny · hodnotí se '+OV_K+' nejlepší starty · '+g.length+' '+cz(g.length,'závodník','závodníci','závodníků')+' s aspoň '+OV_MIN+' starty</div></div>'+
+    '<div class="s">'+catLabelLvl(a.cat)+(a.gen?' · '+genLabel(a.gen):'')+' · individuální i týmové disciplíny · hodnotí se '+OV_K+' nejlepších startů · '+g.length+' '+cz(g.length,'závodník','závodníci','závodníků')+' s aspoň '+OV_MIN+' starty</div></div>'+
     '<div class="big">'+(a.rk<=3?MED[a.rk]+' ':'')+'<b>'+a.rk+'.</b><span> z '+g.length+'</span></div></div><div class="dList">';
   [...a.st].sort((x,y)=>discOrd(x.r.disc)-discOrd(y.r.disc)).forEach(s=>{const f=fieldOf(s.r),inn=a.topIdx.has(s);
     h+=dlRow(esc(dcName(s.r.disc))+(TEAM.has(s.r.disc)?' <span class="x2">tým</span>':''),'<b>'+r1(s.pts)+'</b>',s.r.pl+'. z '+f.e.length+(inn?' · <span class="up">započteno</span>':''),inn?'':' dim');});
