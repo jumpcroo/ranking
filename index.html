@@ -6,17 +6,17 @@
 :root{
   --navy:#1C3981;--navy-d:#152C63;--navy-tint:#E8ECF6;
   --ground:#F4F6FB;--surface:#FFFFFF;--surface-2:#F7F9FC;
-  --ink:#1B2436;--muted:#64708A;--line:#E2E7F0;
+  --ink:#1B2436;--muted:#4A5468;--line:#E2E7F0;
   --ok:#1F9D63;--ok-bg:#E6F5EE;--warn:#C98A00;--warn-bg:#FBF1D9;--bad:#C0392B;--bad-bg:#FBE8E5;
   --chip:#EEF1F8;--chip-on:#1C3981;--shadow:0 1px 2px rgba(20,40,90,.06),0 6px 20px rgba(20,40,90,.06);--radius:14px;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --navy:#5B7FD6;--navy-d:#31518f;--navy-tint:#1a2540;--ground:#0E1320;--surface:#161C2B;--surface-2:#1B2233;
-  --ink:#E7ECF6;--muted:#94A0B8;--line:#28324A;--ok:#4FD196;--ok-bg:#123227;--warn:#F0C15A;--warn-bg:#332913;--bad:#F0857A;--bad-bg:#3a1c1a;
+  --ink:#E7ECF6;--muted:#B4BED2;--line:#28324A;--ok:#4FD196;--ok-bg:#123227;--warn:#F0C15A;--warn-bg:#332913;--bad:#F0857A;--bad-bg:#3a1c1a;
   --chip:#232C42;--chip-on:#5B7FD6;--shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.32);}}
 :root[data-theme="dark"]{
   --navy:#5B7FD6;--navy-d:#31518f;--navy-tint:#1a2540;--ground:#0E1320;--surface:#161C2B;--surface-2:#1B2233;
-  --ink:#E7ECF6;--muted:#94A0B8;--line:#28324A;--ok:#4FD196;--ok-bg:#123227;--warn:#F0C15A;--warn-bg:#332913;--bad:#F0857A;--bad-bg:#3a1c1a;
+  --ink:#E7ECF6;--muted:#B4BED2;--line:#28324A;--ok:#4FD196;--ok-bg:#123227;--warn:#F0C15A;--warn-bg:#332913;--bad:#F0857A;--bad-bg:#3a1c1a;
   --chip:#232C42;--chip-on:#5B7FD6;--shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.32);}
 *{box-sizing:border-box}[hidden]{display:none!important}
 body{margin:0;background:var(--ground);color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:15px;line-height:1.45;-webkit-text-size-adjust:100%}
@@ -225,19 +225,21 @@ header{position:sticky;top:0;z-index:30;background:var(--navy);color:#fff;box-sh
 #psDetail .hl{display:flex;flex-direction:column;gap:3px}
 #psDetail>.h .nm{font-size:22px}#psDetail>.h .meta{font-size:13px}#psDetail .hm{font-size:20px;letter-spacing:2px}
 #psDetail .psBtn{font-size:14px;padding:8px 14px}
-.dBody{padding:6px 18px 30px}
-.dStart{padding:16px 0;border-top:1px solid var(--line)}.dStart:first-child{border-top:0}
+.dBody{padding:4px 18px 30px;background:var(--ground)}
+#psDetail{background:var(--ground)}
+.dStart{padding:14px 16px 12px;margin:14px 0;border:1px solid var(--line);border-radius:14px;background:var(--surface);box-shadow:var(--shadow);border-left:5px solid var(--navy)}
 .dTop{display:flex;align-items:center;gap:10px}
-.dTop .pm{font-size:26px;min-width:34px;font-family:Poppins,sans-serif;font-weight:700;color:var(--muted)}
+.dTop .pm.num{font-size:22px;color:var(--muted)}
+.dTop .pm{font-size:38px;line-height:1;min-width:46px;font-family:Poppins,sans-serif;font-weight:700;color:var(--muted)}
 .dTop .dn{flex:1;font-family:Poppins,sans-serif;font-weight:600;font-size:17px;line-height:1.3}
 .dTop .mates{display:block;font-family:Inter,sans-serif;font-weight:400;font-size:13px;color:var(--muted)}
 .dTop .sc{font-family:Poppins,sans-serif;font-weight:700;font-size:24px}
-.dTags{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 8px 44px}
+.dTags{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 8px 56px}
 .dTags .psDelta{font-size:13px}.dTags .psTag{font-size:12px}
-.dList,.dFs{margin-left:44px}
+.dList,.dFs{margin-left:56px}
 .dRow{display:grid;grid-template-columns:minmax(130px,190px) auto 1fr;gap:4px 12px;align-items:baseline;padding:7px 0;border-top:1px dashed var(--line);font-size:15px}
 .dRow:first-child{border-top:0}
-.dRow .k{color:var(--muted);font-size:14px}.dRow .v{font-family:Poppins,sans-serif;font-weight:600}.dRow .n{font-size:13px;color:var(--muted)}
+.dRow .k{color:var(--ink);opacity:.8;font-size:14.5px}.dRow .v{font-family:Poppins,sans-serif;font-weight:600}.dRow .n{font-size:13.5px;color:var(--muted)}
 .dRow.warn .v{color:var(--warn)}.dRow.bad .v{color:var(--bad)}.dRow.good .v{color:var(--ok)}
 .dRow .up{color:var(--ok);font-weight:600}.dRow .down{color:var(--bad);font-weight:600}
 .dFs{margin-top:10px;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:8px 14px}
@@ -797,7 +799,7 @@ function recommendations(a){
         const missAll=A.loss.miss+A.loss.presMiss;
         if((p.fs.am||0)>0&&missAll/ref>=0.06)
           out.push({pr:0.5+Math.min(0.4,missAll/ref),d,kind:'Čistota',
-            t:'<b>'+esc(nm)+'</b>: '+(p.fs.am===1?'jeden miss':'missy ('+fmt(p.fs.am)+'×)')+' na '+esc(where)+' tě stál'+(p.fs.am===1?'':'y')+' asi <b>'+body(missAll)+'</b> ('+pct(missAll/ref)+' sestavy). '
+            t:'<b>'+esc(nm)+'</b>: '+(p.fs.am===1?'jedna chyba':'chyby ('+fmt(p.fs.am)+'×)')+' na '+esc(where)+' tě stál'+(p.fs.am===1?'a':'y')+' asi <b>'+body(missAll)+'</b> ('+pct(missAll/ref)+' sestavy). '
              +'Miss bere dvakrát – srážkou a ještě bod v každé kategorii prezentace.'});
         if(A.loss.brk/ref>=0.06)
           out.push({pr:0.48+Math.min(0.4,A.loss.brk/ref),d,kind:'Čistota',
@@ -926,7 +928,7 @@ function fsDetail(p){
   h+=row('Výsledek',p.score,pod&&pod.R,pod&&pod.win&&pod.win.R,f2);
   h+='</table>';
   const L=A.loss,items=[];
-  if(L.miss>0.005)items.push(['Missy ('+fmt(fs.am)+'×)',L.miss,false]);
+  if(L.miss>0.005)items.push(['Chyby ('+fmt(fs.am)+'×)',L.miss,false]);
   if(L.presMiss>0.005)items.push(['… a jejich vliv na prezentaci',L.presMiss,true]);
   if(L.brk>0.005)items.push(['Breaky ('+fmt(fs.ab)+'×)',L.brk,false]);
   if(L.viol>0.005)items.push(['Porušení času / prostoru',L.viol,false]);
@@ -956,7 +958,7 @@ function fsDetail(p){
       const lo=PRES_ORDER.reduce((m,k)=>fs.pc[k]!=null&&(m==null||fs.pc[k]<fs.pc[m])?k:m,null);
       det+='<div class="anSec"><div class="anLh">Prezentace po kategoriích <small>(škála 0–24, 12 = průměr)</small></div>';
       PRES_ORDER.forEach(k=>{if(fs.pc[k]==null)return;det+='<div class="anLr"><span>'+PRES_LAB[k]+(k===lo&&fs.pc[k]<mean-0.4?' <i>nejslabší</i>':'')+'</span>'+bar(fs.pc[k],24,fs.pc[k]>=12?'okb':'')+'<b>'+fmt(fs.pc[k])+'</b></div>';});
-      if(fs.pm)det+='<div class="anFoot">Rozhodčí prezentace viděli '+fmt(fs.pm)+'× miss a za každý strhli bod v každé kategorii.</div>';
+      if(fs.pm)det+='<div class="anFoot">Rozhodčí prezentace viděli '+fmt(fs.pm)+'× chybu a za každou strhli bod v každé kategorii.</div>';
       det+='</div>';
     }
   }
@@ -1141,7 +1143,7 @@ function startBlock(a,ev,cd,acc){
   const r=ev.r,sp=isSpeed(r.disc),u=x=>sp?skoky(x):body(x);
   const prior=priorOf(a.aid,r.disc,cd),pScores=prior.map(x=>x.score);
   const av=avg(pScores),best=pScores.length?Math.max(...pScores):null;
-  let h='<div class="dStart"><div class="dTop"><span class="pm">'+(r.pl&&r.pl<=3?MED[r.pl]:(r.pl?r.pl+'.':''))+'</span>'+
+  let h='<div class="dStart"><div class="dTop"><span class="pm'+(r.pl&&r.pl<=3?'':' num')+'">'+(r.pl&&r.pl<=3?MED[r.pl]:(r.pl?r.pl+'.':''))+'</span>'+
     '<span class="dn">'+esc(dcName(r.disc))+' <span class="psLvl">'+r.lc+'</span>'+(TEAM.has(r.disc)?'<span class="mates">s '+r.members.filter(m=>m.aid!==a.aid).map(m=>esc(firstName(m.name))).join(', ')+'</span>':'')+'</span>'+
     '<span class="sc">'+fmt(r.score)+'</span></div><div class="dTags">';
   if(ev.first)h+='<span class="psDelta psFirst">první start v disciplíně</span>';
@@ -1172,7 +1174,7 @@ function startBlock(a,ev,cd,acc){
     if(r.fs.fm!=='dd')h+=dlRow('Povinné prvky','<b>'+pct(Q)+'</b>',cmpNote(Q,A('Q'),true,x=>pct(x)),Q<1?' warn':'');
     h+=dlRow('Srážky','<b>'+(M>=1?'0 %':'−'+pct(1-M))+'</b>',cmpNote(1-M,A('M')==null?null:1-A('M'),false,x=>pct(x)),M<1?' warn':'');
     if(fa){const L=fa.loss,parts=[];
-      if(L.miss>0.005)parts.push('missy −'+fmt(L.miss));if(L.brk>0.005)parts.push('breaky −'+fmt(L.brk));
+      if(L.miss>0.005)parts.push('chyby −'+fmt(L.miss));if(L.brk>0.005)parts.push('breaky −'+fmt(L.brk));
       if(L.viol>0.005)parts.push('porušení −'+fmt(L.viol));if(L.req>0.005)parts.push('povinné prvky −'+fmt(L.req));
       if(parts.length)h+=dlRow('Kolik stály chyby',parts.join('<br>'),'');
       if(fa.cleanPlace!=null&&r.pl&&fa.cleanPlace<r.pl)h+=dlRow('Bez chyb (odhad)','<b>'+fmt(fa.clean)+'</b>','→ '+fa.cleanPlace+'. místo',' good');}
@@ -1194,7 +1196,7 @@ function startBlock(a,ev,cd,acc){
   else if(ev.delta<0&&prior.length===1)acc.off.push('<b>'+esc(nm)+'</b>: '+fmt(r.score)+' proti minulým '+fmt(ev.prev.score));
   if(fa){const L=fa.loss,miss=L.miss+L.presMiss;
     if(fa.cleanPlace!=null&&r.pl&&fa.cleanPlace<r.pl)acc.work.push('<b>'+esc(nm)+'</b>: čistota – chyby stály zhruba '+body(miss+L.brk+L.viol+L.req)+', bez nich by to bylo '+fa.cleanPlace+'. místo');
-    else if(miss>0.05)acc.work.push('<b>'+esc(nm)+'</b>: missy stály '+body(miss));
+    else if(miss>0.05)acc.work.push('<b>'+esc(nm)+'</b>: chyby stály '+body(miss));
     if(r.fs.Q!=null&&r.fs.Q<1)acc.work.push('<b>'+esc(nm)+'</b>: chybějící povinné prvky ('+pct(r.fs.Q)+')');}
   if(r.sm)acc.work.push('<b>'+esc(nm)+'</b>: chybný start nebo výměna stál '+skoky(r.sm));
   if(g&&r.pl>1){const t=g.targets[0];if(t&&t.score&&t.gap/t.score<=0.03)acc.work.push('<b>'+esc(nm)+'</b>: na '+t.k+'. místo chybělo jen '+u(t.gap));}

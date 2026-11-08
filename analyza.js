@@ -152,7 +152,7 @@ function recommendations(a){
         const missAll=A.loss.miss+A.loss.presMiss;
         if((p.fs.am||0)>0&&missAll/ref>=0.06)
           out.push({pr:0.5+Math.min(0.4,missAll/ref),d,kind:'Čistota',
-            t:'<b>'+esc(nm)+'</b>: '+(p.fs.am===1?'jeden miss':'missy ('+fmt(p.fs.am)+'×)')+' na '+esc(where)+' tě stál'+(p.fs.am===1?'':'y')+' asi <b>'+body(missAll)+'</b> ('+pct(missAll/ref)+' sestavy). '
+            t:'<b>'+esc(nm)+'</b>: '+(p.fs.am===1?'jedna chyba':'chyby ('+fmt(p.fs.am)+'×)')+' na '+esc(where)+' tě stál'+(p.fs.am===1?'a':'y')+' asi <b>'+body(missAll)+'</b> ('+pct(missAll/ref)+' sestavy). '
              +'Miss bere dvakrát – srážkou a ještě bod v každé kategorii prezentace.'});
         if(A.loss.brk/ref>=0.06)
           out.push({pr:0.48+Math.min(0.4,A.loss.brk/ref),d,kind:'Čistota',
@@ -281,7 +281,7 @@ function fsDetail(p){
   h+=row('Výsledek',p.score,pod&&pod.R,pod&&pod.win&&pod.win.R,f2);
   h+='</table>';
   const L=A.loss,items=[];
-  if(L.miss>0.005)items.push(['Missy ('+fmt(fs.am)+'×)',L.miss,false]);
+  if(L.miss>0.005)items.push(['Chyby ('+fmt(fs.am)+'×)',L.miss,false]);
   if(L.presMiss>0.005)items.push(['… a jejich vliv na prezentaci',L.presMiss,true]);
   if(L.brk>0.005)items.push(['Breaky ('+fmt(fs.ab)+'×)',L.brk,false]);
   if(L.viol>0.005)items.push(['Porušení času / prostoru',L.viol,false]);
@@ -311,7 +311,7 @@ function fsDetail(p){
       const lo=PRES_ORDER.reduce((m,k)=>fs.pc[k]!=null&&(m==null||fs.pc[k]<fs.pc[m])?k:m,null);
       det+='<div class="anSec"><div class="anLh">Prezentace po kategoriích <small>(škála 0–24, 12 = průměr)</small></div>';
       PRES_ORDER.forEach(k=>{if(fs.pc[k]==null)return;det+='<div class="anLr"><span>'+PRES_LAB[k]+(k===lo&&fs.pc[k]<mean-0.4?' <i>nejslabší</i>':'')+'</span>'+bar(fs.pc[k],24,fs.pc[k]>=12?'okb':'')+'<b>'+fmt(fs.pc[k])+'</b></div>';});
-      if(fs.pm)det+='<div class="anFoot">Rozhodčí prezentace viděli '+fmt(fs.pm)+'× miss a za každý strhli bod v každé kategorii.</div>';
+      if(fs.pm)det+='<div class="anFoot">Rozhodčí prezentace viděli '+fmt(fs.pm)+'× chybu a za každou strhli bod v každé kategorii.</div>';
       det+='</div>';
     }
   }
