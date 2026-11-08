@@ -56,6 +56,22 @@ def load_json(path):
         return json.load(f)
 
 
+# ---------------------------------------------------------------- pojistka
+# Repo je veřejné. Surové exporty obsahují e-maily a ID rozhodčích a
+# zapisovatelů – do data/ smí jen soubory prohnané přes sanitize.py.
+_EMAIL = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
+_FORBIDDEN = ("UserEmail", "UserID", "DeviceSessionID", "LastJudgeDataChange", "LastChange")
+for _f in sorted(glob.glob(os.path.join(DATA, "*.json"))):
+    _t = open(_f, encoding="utf-8").read()
+    _bad = [k for k in _FORBIDDEN if '"%s"' % k in _t]
+    if _EMAIL.search(_t) or _bad:
+        die(
+            "%s obsahuje osobní údaje (%s).\n"
+            "  Surový export nepatří do veřejného repa. Prožeň ho nejdřív:\n"
+            "  python3 sanitize.py <surový.json> data/<název.json>"
+            % (os.path.basename(_f), ", ".join(_bad) or "e-mail")
+        )
+
 # ---------------------------------------------------------------- vstupy
 legacy = load_json(LEGACY)
 cfg = load_json(CONFIG)

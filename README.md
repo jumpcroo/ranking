@@ -23,9 +23,12 @@ Na Webnode je v HTML poli vložené jen tohle a nikdy se to nemění:
 
 ## Přidání nové soutěže
 
-1. JSON export z výsledkového systému vlož do `data/`.
-   **Úroveň závodu dej do názvu souboru** – `... A.json` nebo `... B.json`,
-   například `S-BEE 2026 A.json`.
+1. JSON export z výsledkového systému **prožeň přes `sanitize.py`** a teprve
+   výsledek ulož do `data/`:
+   `python3 sanitize.py "<surový export>.json" "data/S-BEE 2026 A.json"`
+   **Úroveň závodu dej do názvu souboru** – `... A.json` nebo `... B.json`.
+   Surový export obsahuje e-maily a ID rozhodčích a zapisovatelů; build
+   ho do veřejného repa nepustí a zastaví se.
 2. `python3 build.py` (nebo `python3 build.py --check`, když chceš jen vidět,
    co by se stalo, a nic nepřepsat).
 3. Commitni `index.html` a nový soubor v `data/`.
@@ -117,6 +120,7 @@ https://www.czechjumprope.cz/soutezni-system/
 | | |
 |---|---|
 | `build.py` | přepočet; všechna logika je tady |
+| `sanitize.py` | očištění exportu od osobních údajů před vložením do `data/` |
 | `template.html` | stránka bez dat, se značkou `__DATA__` |
 | `config.json` | úrovně smíšených soutěží, sjednocení názvů oddílů |
 | `data/legacy.json` | zamrzlá ověřená data soutěží do Czech Open 2026 včetně |
@@ -130,6 +134,11 @@ U historických soutěží jsou v něm A/B příznaky jednotlivých výsledků, 
 není z čeho odvodit (viz výš o smíšených soutěžích).
 
 ## Osobní údaje
+
+**Exporty z výsledkového systému.** U každého zásahu do výsledku je v nich
+e-mail a ID člověka, který ho provedl (rozhodčí, zapisovatelé), a ID zařízení.
+`sanitize.py` to odstraní a pak soubor ještě prohledá na cokoli, co vypadá
+jako e-mail. `build.py` navíc odmítne běžet, když v `data/` takový údaj najde.
 
 **Repo je veřejné** – jinak by GitHub Pages zadarmo nefungovaly. Cokoli se sem
 commitne, si může kdokoli stáhnout. Proto sem **nepatří seznam členů**: jsou
