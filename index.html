@@ -514,7 +514,7 @@ function limFrom(){const pl=DATA.plan||{};
   return pl.nomination?winFromOf(pl.nomination.deadline):WIN_FROM;}
 function limNote(){const pl=DATA.plan||{};
   if(state.target==='mcr')return pl.mcr?'Kvalifikace na <b>'+esc(pl.mcr.name)+'</b> ('+czDate(pl.mcr.date)+'): počítají se výsledky z A i B <b>od '+czDate(limFrom())+'</b> – 10 celých kalendářních měsíců před MČR plus měsíc konání. Starší výsledky se nepočítají.':'';
-  return pl.nomination?'Nominace <b>'+esc(pl.nomination.name)+'</b>: výsledky <b>od '+czDate(limFrom())+'</b> (rozhodné období k přihláškám '+czDate(pl.nomination.deadline)+'), kategorie podle sezóny '+(DATA.nextSeason||'')+'. '+((DATA.repre||[]).length?'Jen označená reprezentace.':'Kategorie 12–15 a 16+.'):'';}
+  return pl.nomination?'Nominace <b>'+esc(pl.nomination.name)+'</b>: výsledky <b>od '+czDate(limFrom())+'</b> (rozhodné období k přihláškám '+czDate(pl.nomination.deadline)+'), <b>jen z A soutěží</b> (a mezinárodních), kategorie podle sezóny '+(DATA.nextSeason||'')+'. '+((DATA.repre||[]).length?'Jen označená reprezentace.':'Kategorie 12–15 a 16+.'):'';}
 function buildLimDisc(lp){const el=document.getElementById('limDisc');if(!el)return;
   const ds=[...new Set(lp.map(r=>r.disc))].sort((a,b)=>(DISC_ORDER.indexOf(a)+1||99)-(DISC_ORDER.indexOf(b)+1||99));
   [...state.limDisc].forEach(d=>{if(!ds.includes(d))state.limDisc.delete(d);});
@@ -583,7 +583,8 @@ function render(){
     /* Limity jen pro Jumpcroo. MČR: kvalifikace z výsledků A i B za 10 celých měsíců
        před MČR + měsíc konání. MS/ME: rozhodné období k nominaci, kategorie sezóny 2027. */
     const isMcr=state.target==='mcr',LF=limFrom();
-    let lp=P.filter(r=>r.cL&&r.club==='Jumpcroo'&&(r.date||'')>=LF);
+    /* MČR: limit z A i B; MS/ME: jen z A (a mezinárodních) */
+    let lp=P.filter(r=>(isMcr?r.cL:r.cR)&&r.club==='Jumpcroo'&&(r.date||'')>=LF);
     if(state.gen.size)lp=lp.filter(r=>state.gen.has(r.gender));
     buildLimDisc(lp);
     if(state.limDisc.size)lp=lp.filter(r=>state.limDisc.has(r.disc));
@@ -1114,7 +1115,7 @@ function planRows(a){
     /* nejlepší sestava (u týmů) podle součtu dvou nejlepších */
     const cand=ents.filter(o=>o.disc===d&&mine(o,a.aid)).sort((x,y)=>y.sum-x.sum);
     const self=cand[0]||null;
-    const lp=perfs.filter(r=>r.disc===d&&r.cL);const best=lp.length?Math.max(...lp.map(r=>r.score)):null;
+    const lp=perfs.filter(r=>r.disc===d&&r.cR); /* limit ME/MS jen z A soutěží */const best=lp.length?Math.max(...lp.map(r=>r.score)):null;
     const bestRec=lp.find(r=>r.score===best)||null;
     const pb=Math.max(...P.filter(r=>r.disc===d&&r.members.some(m=>m.aid===a.aid)).map(r=>r.score));
     const gen=self?self.gender:(lp[0]?lp[0].gender:a.gender);
@@ -1180,7 +1181,7 @@ function renderPlan(host,a){
       h+='<div class="plTr"><div class="d"><b>'+esc(dcName(r.d))+'</b>'+(r.members?'<span class="plM">'+r.members.map(m=>esc(firstName(m.name))).join(', ')+'</span>':'')+'</div>'+
         '<div class="r">'+rk+(r.self?'<span class="plB">součet '+fmt(r.sum)+(r.cnt<2?' (jen 1 áčko)':'')+'</span>':'')+'</div>'+
         '<div class="s">'+st+(r.atNext?'<span class="plB">ještě S-BEE</span>':'<span class="plB">uzavřeno</span>')+'</div></div>';});
-    h+='</div><div class="anFoot">Pořadí = nominační ranking (součet dvou nejlepších áček), stav limitu z A i B. Odhad v nové kategorii počítá ostatní oddíly v jejich dnešní kategorii.</div>';
+    h+='</div><div class="anFoot">Pořadí = nominační ranking (součet dvou nejlepších áček), limit ME/MS jen z A soutěží. Odhad v nové kategorii počítá ostatní oddíly v jejich dnešní kategorii.</div>';
     c.innerHTML=h;host.appendChild(c);}
 }
 function renderProfile(host,a){
@@ -1246,10 +1247,11 @@ function evalStart(aid,r,cd){
   const h=(histIdx().get(aid+'|'+r.disc)||[]).filter(x=>(x.date||'')<cd);
   const prev=h.length?h[h.length-1]:null;
   const bb=h.length?Math.max.apply(null,h.map(x=>x.score)):null;
+  const hA=h.filter(x=>x.cR),bbA=hA.length?Math.max.apply(null,hA.map(x=>x.score)):null;
   const lc=r.al===2?'junior':r.al===3?'senior':null;
   const lm=limitFor(r.disc,lc,'mcr'),ls=limitFor(r.disc,lc,'ms');
   return{r,prev,delta:prev?r.score-prev.score:null,pb:bb!==null&&r.score>bb,first:bb===null,
-    newMcr:lm!=null&&r.score>=lm&&(bb===null||bb<lm),newMs:ls!=null&&r.score>=ls&&(bb===null||bb<ls),lm,ls};
+    newMcr:lm!=null&&r.score>=lm&&(bb===null||bb<lm),newMs:ls!=null&&r.cR&&r.score>=ls&&(bbA===null||bbA<ls),lm,ls};
 }
 function compSummary(comp,clubs){
   const cd=compDate[comp]||'';
@@ -1475,7 +1477,7 @@ function startBlock(a,ev,cd,acc){
     else{note='chybí <b>'+u(ev.lm-r.score)+'</b>';cls=' warn';}
     h+=dlRow('Limit MČR','<b>'+fmt(ev.lm)+'</b>',note,cls);}
   if(ev.ls!=null&&showMs(a.aid,r.al))
-    h+=dlRow('Limit ME/MS',fmt(ev.ls),r.score>=ev.ls?'✔ splněno':'chybí '+u(ev.ls-r.score),r.score>=ev.ls?' good':'');
+    h+=dlRow('Limit ME/MS',fmt(ev.ls),!r.cR?'výsledek z B se do limitu ME/MS nepočítá':r.score>=ev.ls?'✔ splněno':'chybí '+u(ev.ls-r.score),r.cR&&r.score>=ev.ls?' good':'');
   h+='</div>';
   /* freestyle pod sebou */
   let fa=null;
