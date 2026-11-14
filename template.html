@@ -288,6 +288,16 @@ header{position:sticky;top:0;z-index:30;background:var(--navy);color:#fff;box-sh
 .llBar{height:5px;border-radius:3px;background:var(--chip);margin-top:6px;overflow:hidden}.llBar i{display:block;height:100%;background:var(--ok)}
 .llBar i.warn{background:var(--warn)}.llBar i.bad{background:var(--bad)}
 @media (max-width:560px){.llR{grid-template-columns:1fr auto}.llSt{grid-column:1/-1}}
+.fsDet{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+.fsDet>summary{cursor:pointer;font-weight:600;font-size:14px;color:var(--navy);padding:4px 0;list-style:revert}
+.fsSec{margin:10px 0 4px}
+.fsH{font-family:Poppins,sans-serif;font-weight:700;font-size:14px;letter-spacing:.04em;color:var(--navy);padding:4px 0;border-bottom:2px solid var(--navy)}
+.fsH span{font-family:Inter,sans-serif;font-weight:400;font-size:12.5px;letter-spacing:0;color:var(--muted);margin-left:8px}
+.fsLv{overflow-x:auto;margin:6px 0}.fsLv table{border-collapse:collapse;font-size:13px;min-width:100%}
+.fsLv th{font-size:11.5px;color:var(--muted);font-weight:600;padding:3px 5px;text-align:center}
+.fsLv td{padding:4px 5px;text-align:center;border-top:1px solid var(--line);font-variant-numeric:tabular-nums}
+.fsLv td:first-child{text-align:left;white-space:nowrap;color:var(--ink)}.fsLv td.z{color:var(--line)}
+.fsNote{font-size:12.5px;color:var(--muted);margin-top:4px}
 .dSum{margin-top:18px;border-top:2px solid var(--navy);padding-top:14px}
 .dSumH{font-family:Poppins,sans-serif;font-weight:700;font-size:19px;margin-bottom:10px}
 .dSumG{border-radius:12px;padding:12px 14px;margin-bottom:10px;font-size:15px;line-height:1.55}
@@ -1113,6 +1123,45 @@ function cmpNote(cur,av,higherBetter,f){if(av==null)return '';
   const d=cur-av;if(Math.abs(d)<1e-9)return 'jako tvůj průměr';
   const good=higherBetter?d>0:d<0;
   return '<span class="'+(good?'up':'down')+'">'+(d>0?'▲ ':'▼ ')+f(Math.abs(d))+'</span> proti průměru '+f(av);}
+/* Podrobné skóre freestylu po rozhodcovských skupinách: DIFF → PREZ → TECH */
+function fsScoreDetail(fs){
+  if(!fs)return '';
+  const f2=x=>fmt(Math.round(x*100)/100);
+  const sec=(t,sub,body)=>'<div class="fsSec"><div class="fsH">'+t+(sub?'<span>'+sub+'</span>':'')+'</div>'+body+'</div>';
+  let h='';
+  /* DIFF */
+  let d='';
+  if(fs.d){
+    const keys=Object.keys(fs.d);
+    d+=dlRow('Obtížnost D','<b>'+f2(fs.D)+'</b>',fs.fm==='dd'?'D = jumper × 1,4 + turner':'průměr '+keys.length+' částí');
+    keys.forEach(k=>{d+=dlRow(DT_LAB[k]||k,f2(fs.d[k]),'');});
+    if(fs.lv){const labs=fs.fm==='dd'?LV_DD:LV_SR;
+      let t='<div class="fsLv"><table><thead><tr><th></th>'+labs.map(l=>'<th>L'+l+'</th>').join('')+'</tr></thead><tbody>';
+      Object.keys(fs.lv).forEach(k=>{t+='<tr><td>'+(DT_LAB[k]||k)+'</td>'+labs.map((_,i)=>{const v=fs.lv[k][i]||0;return '<td'+(v?'':' class="z"')+'>'+(v?fmt(Math.round(v*10)/10):'·')+'</td>';}).join('')+'</tr>';});
+      t+='</tbody></table><div class="fsNote">Počet prvků v každé úrovni (průměr rozhodčích obtížnosti).</div></div>';
+      d+=t;}
+  }
+  h+=sec('DIFF','obtížnost',d||'<div class="fsNote">Bez dat.</div>');
+  /* PREZ */
+  let p='';
+  p+=dlRow('Prezentace P','<b>'+f2(fs.P)+'</b>','výsledek se násobí (1 + P)');
+  if(fs.pc){const W={ent:'25 %',form:'25 %',music:'20 %',crea:'15 %',vari:'15 %'};
+    PRES_ORDER.forEach(k=>{if(fs.pc[k]==null)return;const v=fs.pc[k];
+      p+=dlRow(PRES_LAB[k],'<b>'+fmt(v)+'</b> / 24','váha '+W[k]+(v>12?' · nad průměrem':v<12?' · pod průměrem':' · průměr'),v>=12?' good':' warn');});}
+  if(fs.pm!=null)p+=dlRow('Chyby viděné prezentací',fmt(fs.pm)+'×','každá strhává bod v každé kategorii',fs.pm?' warn':'');
+  h+=sec('PREZ','prezentace · škála 0–24, 12 = průměr',p);
+  /* TECH */
+  let t='';
+  const pc_=x=>x?'−'+pct(x):'0 %';
+  t+=dlRow('Chyby',fmt(fs.am||0)+'×','srážka '+pc_(fs.xm),fs.am?' warn':' good');
+  if(fs.fm!=='dd'||fs.ab)t+=dlRow('Breaky',fmt(fs.ab||0)+'×',fs.fm==='dd'?'v DD se nestrhává':'srážka '+pc_(fs.xb),fs.ab?' warn':' good');
+  t+=dlRow('Porušení času / prostoru',fmt(fs.av||0)+'×','srážka '+pc_(fs.xv),fs.av?' warn':' good');
+  t+=dlRow('Srážky celkem (M)','<b>'+(fs.M>=1?'0 %':'−'+pct(1-fs.M))+'</b>','výsledek se násobí '+f2(fs.M));
+  if(fs.q){Object.keys(fs.q).forEach(k=>{const v=fs.q[k];t+=dlRow('Povinné prvky – '+(REQ_LAB[k]||k),v?'chybí '+fmt(v):'✔ splněno','',v?' warn':' good');});
+    t+=dlRow('Povinné prvky (Q)','<b>'+pct(fs.Q==null?1:fs.Q)+'</b>','výsledek se násobí '+f2(fs.Q==null?1:fs.Q));}
+  h+=sec('TECH','technický rozhodčí',t);
+  return '<details class="fsDet"><summary>Podrobné skóre: DIFF · PREZ · TECH</summary>'+h+'</details>';
+}
 function startBlock(a,ev,cd,acc){
   const r=ev.r,sp=isSpeed(r.disc),u=x=>sp?skoky(x):body(x);
   const prior=priorOf(a.aid,r.disc,cd),pScores=prior.map(x=>x.score);
@@ -1166,6 +1215,7 @@ function startBlock(a,ev,cd,acc){
       if(L.viol>0.005)parts.push('porušení −'+fmt(L.viol));if(L.req>0.005)parts.push('povinné prvky −'+fmt(L.req));
       if(parts.length)h+=dlRow('Kolik stály chyby',parts.join('<br>'),'');
       if(fa.cleanPlace!=null&&r.pl&&fa.cleanPlace<r.pl)h+=dlRow('Bez chyb (odhad)','<b>'+fmt(fa.clean)+'</b>','→ '+fa.cleanPlace+'. místo',' good');}
+    h+=fsScoreDetail(r.fs);
     h+='</div>';}
   h+='</div>';
   /* podklady pro shrnutí */
