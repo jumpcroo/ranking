@@ -1204,15 +1204,6 @@ function athDetail(a,S){
   h+=overallAllBlock(a.aid,S.comp);
   {const oa=overallAll(S.comp).get(a.aid);if(oa&&oa.rk!=null&&oa.grp.length>=2&&oa.rk<=3)acc.good.push('<b>Overall (5 nejlepších startů)</b>: '+oa.rk+'. místo z '+oa.grp.length);}
   a.items.forEach(ev=>{h+=startBlock(a,ev,S.cd,acc);});
-  if(moves){
-    const lc=nxtC===2?'junior':nxtC===3?'senior':null,H=histIdx(),ms=REPRE.size?REPRE.has(a.aid):(nxtC===2||nxtC===3);
-    const seen={},lines=[];
-    if(ms&&lc)a.items.forEach(ev=>{const r=ev.r;if(seen[r.disc])return;seen[r.disc]=1;
-      const lim=limitFor(r.disc,lc,'ms');if(lim==null)return;
-      const mine=(H.get(a.aid+'|'+r.disc)||[]).reduce((m,x)=>Math.max(m,x.score),0);
-      lines.push(dlRow(esc(dcName(r.disc)),'limit <b>'+fmt(lim)+'</b>',mine>=lim?'<span class="up">splněno, máš '+fmt(mine)+'</span>':'chybí '+fmt(lim-mine)));});
-    h+='<div class="psNextBox"><div class="t">Od 1. 1. '+NEXT_SEASON+' závodíš v kategorii '+catLabelLvl(nxtC)+'</div>'+
-      '<div class="s">Limit MČR zůstává stejný, v nové kategorii tě ale čeká silnější konkurence.'+(lines.length?' Limity na ME/MS v nové kategorii a tvé nejlepší výkony:':'')+'</div>'+lines.join('')+'</div>';}
   /* body se stejnou disciplínou spojit do jedné odrážky */
   const li=arr=>{const m=new Map();arr.forEach(x=>{const k=x.match(/^<b>(.*?)<\/b>: /);const d=k?k[1]:'';const t=k?x.slice(k[0].length):x;
       if(!m.has(d))m.set(d,[]);m.get(d).push(t);});
